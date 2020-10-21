@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,10 +17,10 @@ namespace Synonymizer {
             for (int i = 0; i < words.Count; i++) {
                 string word = textBuilder.ToString(words[i].StartIndex + difference, words[i].EndIndex + 1 - words[i].StartIndex);
 
-                int index = BinarySearch(SynonymDictionary.synonyms, word.ToLower(), 0, SynonymDictionary.synonyms.Count - 1);
+                int index = BinarySearch(SynonymDictionary.dictionary, word.ToLower(), 0, SynonymDictionary.dictionary.Count - 1);
 
                 if (index >= 0) {
-                    string synonym = SynonymDictionary.synonyms[SynonymDictionary.synonyms[index].SynonymId].Word;
+                    string synonym = SynonymDictionary.dictionary[SynonymDictionary.dictionary[index].SynonymId].Word;
                     if (char.IsUpper(word[0])) {
                         synonym = char.ToUpper(synonym[0]) + synonym.Substring(1);
                     }
@@ -62,11 +63,11 @@ namespace Synonymizer {
 
             for (int i = 0; i < text.Length; i++) {
                 if (start < 0) {
-                    if (text[i] != ' ' && text[i] != '\n' && text[i] != '\r' && !char.IsPunctuation(text[i])) {
+                    if (!new char[] { ' ', '\n', '\r' }.Contains(text[i]) && !char.IsPunctuation(text[i])) {
                         start = i;
                     }
                 } else {
-                    if (text[i] == ' ' || text[i] == '\n' || text[i] == '\r' || char.IsPunctuation(text[i])) {
+                    if (new char[] { ' ', '\n', '\r' }.Contains(text[i]) || char.IsPunctuation(text[i])) {
                         words.Add(new Word(start, i - 1));
                         start = -1;
                     }
