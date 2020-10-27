@@ -42,13 +42,17 @@
               "target": "Package",
               "version": "[2.11.3, )"
             },
-            "Microsoft.AspNet.WebApi.Client": {
+            "MongoDB.Driver": {
               "target": "Package",
-              "version": "[5.2.7, )"
+              "version": "[2.11.3, )"
             },
             "Newtonsoft.Json": {
               "target": "Package",
               "version": "[12.0.3, )"
+            },
+            "System.Configuration.ConfigurationManager": {
+              "target": "Package",
+              "version": "[4.7.0, )"
             }
           },
           "imports": [
