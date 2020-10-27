@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "E:\\GitHub\\SynWord-Server-CSharp\\SynWord-Server-CSharp.csproj": {}
+    "C:\\Users\\I7-3770\\Documents\\GitHub\\SynWord-Server-CSharp\\SynWord-Server-CSharp.csproj": {}
   },
   "projects": {
-    "E:\\GitHub\\SynWord-Server-CSharp\\SynWord-Server-CSharp.csproj": {
+    "C:\\Users\\I7-3770\\Documents\\GitHub\\SynWord-Server-CSharp\\SynWord-Server-CSharp.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\GitHub\\SynWord-Server-CSharp\\SynWord-Server-CSharp.csproj",
+        "projectUniqueName": "C:\\Users\\I7-3770\\Documents\\GitHub\\SynWord-Server-CSharp\\SynWord-Server-CSharp.csproj",
         "projectName": "SynWord-Server-CSharp",
-        "projectPath": "E:\\GitHub\\SynWord-Server-CSharp\\SynWord-Server-CSharp.csproj",
-        "packagesPath": "C:\\Users\\glebb\\.nuget\\packages\\",
-        "outputPath": "E:\\GitHub\\SynWord-Server-CSharp\\obj\\",
+        "projectPath": "C:\\Users\\I7-3770\\Documents\\GitHub\\SynWord-Server-CSharp\\SynWord-Server-CSharp.csproj",
+        "packagesPath": "C:\\Users\\I7-3770\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\I7-3770\\Documents\\GitHub\\SynWord-Server-CSharp\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\glebb\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\I7-3770\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -37,6 +37,20 @@
       },
       "frameworks": {
         "netcoreapp3.1": {
+          "dependencies": {
+            "DocumentFormat.OpenXml": {
+              "target": "Package",
+              "version": "[2.11.3, )"
+            },
+            "Microsoft.AspNet.WebApi.Client": {
+              "target": "Package",
+              "version": "[5.2.7, )"
+            },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[12.0.3, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",
@@ -55,7 +69,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.401\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.403\\RuntimeIdentifierGraph.json"
         }
       }
     }
