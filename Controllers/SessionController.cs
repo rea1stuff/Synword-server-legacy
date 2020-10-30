@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
 using Logging;
 
@@ -14,7 +9,7 @@ namespace SynWord_Server_CSharp.Controllers
     public class SessionController : ControllerBase
     {
 
-        private static VisitsLog visitation = new VisitsLog();
+        private VisitsLog visitation = new VisitsLog();
 
         [HttpGet]
         public void Get()

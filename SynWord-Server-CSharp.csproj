@@ -6,9 +6,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\Uploaded files\**" />
+    <Content Remove="wwwroot\Uploaded files\**" />
+    <EmbeddedResource Remove="wwwroot\Uploaded files\**" />
+    <None Remove="wwwroot\Uploaded files\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="DocumentFormat.OpenXml" Version="2.11.3" />
-    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
+    <PackageReference Include="MongoDB.Driver" Version="2.11.3" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\Uploaded_Files\" />
   </ItemGroup>
 
 

@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using DocumentFormat.OpenXml.Math;
 using Microsoft.AspNetCore.Mvc;
 
 using UniqueCheck;
@@ -14,10 +11,11 @@ namespace SynWord_Server_CSharp.Controllers
     [ApiController]
     public class UniqueCheckController : ControllerBase
     {
-        private static readonly ContentWatchAPI_Model contentWatchModel = new ContentWatchAPI_Model();
         private static UniqueCheckFromContentWatchAPI uniqueCheckFromAPI = new UniqueCheckFromContentWatchAPI();
         private static UniqueCheckUsageLog usageLog = new UniqueCheckUsageLog();
+
         private int dailyLimit = 10;
+        private int symbolLimit = 20000;
 
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] UniqueCheckModel uniqueCheck)
@@ -28,19 +26,23 @@ namespace SynWord_Server_CSharp.Controllers
 
                 usageLog.CheckIPexistsIfNotThenCreate(clientIP);
 
-                if (usageLog.getUsesIn24H(clientIP) < dailyLimit)
+                if (symbolLimit < uniqueCheck.text.Length)
                 {
-                    var response = await uniqueCheckFromAPI.postReqest(uniqueCheck.text);
-                    return Ok(response);
+                    return BadRequest("symbolLimitReached");
                 }
-                else
+
+                if (usageLog.getUsesIn24H(clientIP) > dailyLimit)
                 {
                     return BadRequest("dailyLimitReached");
                 }
+
+                var response = await uniqueCheckFromAPI.postReqest(uniqueCheck.text);
+                return Ok(response);
+
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest();
+                return BadRequest(ex.Message);
             }
         }
     }

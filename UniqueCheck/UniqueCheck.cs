@@ -1,9 +1,6 @@
 ﻿using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace UniqueCheck
@@ -21,8 +18,9 @@ namespace UniqueCheck
             HttpClient httpClient = new HttpClient();
 
             Dictionary<string, string> values = new Dictionary<string, string> {
-                    { "action", "GET_BALANCE" },
-                    { "key", api.APIkey }
+                    { "key", api.APIkey },
+                    { "text", text },
+                    { "test", "1" }
             };
 
             FormUrlEncodedContent content = new FormUrlEncodedContent(values);
