@@ -2,8 +2,9 @@
 using System.Configuration;
 using MongoDB.Driver;
 using MongoDB.Bson;
+using Model;
 
-namespace Synonymizer {
+namespace Synonymize {
     static class SynonymDictionary {
         static public List<Synonym> dictionary;
 

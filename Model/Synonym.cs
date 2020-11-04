@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace Synonymizer {
+namespace Model {
     [Serializable]
     class Synonym {
         public int Id { get; set; }

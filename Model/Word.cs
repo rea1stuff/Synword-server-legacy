@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Synonymizer {
+namespace Model {
     class Word {
         public int StartIndex { get; set; }
         public int EndIndex { get; set; }

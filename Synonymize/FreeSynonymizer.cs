@@ -2,8 +2,9 @@
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Model;
 
-namespace Synonymizer {
+namespace Synonymize {
     class FreeSynonymizer : ISynonymizer {
         public async Task<string> SynonymizeAsync(string text) {
             return await Task.Run(() => Synonymize(text));
@@ -75,7 +76,7 @@ namespace Synonymizer {
             }
 
             if (start >= 0) {
-                words.Add(new Word(start, words.Count - 1));
+                words.Add(new Word(start, text.Length - 1));
             }
 
             return words;

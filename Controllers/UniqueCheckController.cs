@@ -23,21 +23,20 @@ namespace SynWord_Server_CSharp.Controllers
             try
             {
                 var clientIP = Request.HttpContext.Connection.RemoteIpAddress.ToString();
-
-                usageLog.CheckIPexistsIfNotThenCreate(clientIP);
+                usageLog.CheckIpExistsIfNotThenCreate(clientIP);
 
                 if (symbolLimit < uniqueCheck.text.Length)
                 {
                     return BadRequest("symbolLimitReached");
                 }
 
-                if (usageLog.getUsesIn24H(clientIP) > dailyLimit)
+                if (usageLog.GetUsesIn24Hours(clientIP) > dailyLimit)
                 {
                     return BadRequest("dailyLimitReached");
                 }
 
                 var response = await uniqueCheckFromAPI.postReqest(uniqueCheck.text);
-                return Ok(response);
+                return response;
 
             }
             catch (Exception ex)

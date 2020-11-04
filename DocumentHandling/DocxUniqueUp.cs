@@ -1,6 +1,6 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
-using Synonymizer;
+using Synonymize;
 
 namespace DocumentUniqueUp
 {

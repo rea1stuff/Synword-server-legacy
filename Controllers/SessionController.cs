@@ -16,8 +16,8 @@ namespace SynWord_Server_CSharp.Controllers
         {
             var clientIP = Request.HttpContext.Connection.RemoteIpAddress.ToString();
 
-            visitation.CheckIPexistsIfNotThenCreate(clientIP);
-            visitation.IncrementNumberOfVisitsIn24H(clientIP);
+            visitation.CheckIpExistsIfNotThenCreate(clientIP);
+            visitation.IncrementNumberOfVisitsIn24Hours(clientIP);
         }
     }
 }
