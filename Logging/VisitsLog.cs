@@ -4,16 +4,16 @@ using System.Configuration;
 using MongoDB.Driver;
 using MongoDB.Bson;
 
-namespace Logging {
+namespace SynWord_Server_CSharp.Logging {
     public class VisitsLog {
-        readonly private IMongoClient client;
+        readonly private IMongoClient _client;
 
         public VisitsLog() {
-            client = new MongoClient(ConfigurationManager.AppSettings["connectionString"]);
+            _client = new MongoClient(ConfigurationManager.AppSettings["connectionString"]);
         }
 
         public void CheckIpExistsIfNotThenCreate(string ip) {
-            IMongoDatabase database = client.GetDatabase("synword");
+            IMongoDatabase database = _client.GetDatabase("synword");
             IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("visits");
             BsonDocument filter = new BsonDocument("ip", ip);
             List<BsonDocument> documents = collection.Find(filter).ToList();
@@ -24,7 +24,7 @@ namespace Logging {
         }
 
         private void UploadIpToDataBase(string ip) {
-            IMongoDatabase database = client.GetDatabase("synword");
+            IMongoDatabase database = _client.GetDatabase("synword");
             IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("visits");
 
             BsonDocument document = new BsonDocument{
@@ -37,7 +37,7 @@ namespace Logging {
         }
 
         public int GetVisitsIn24Hours(string ip) {
-            IMongoDatabase database = client.GetDatabase("synword");
+            IMongoDatabase database = _client.GetDatabase("synword");
             IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("visits");
             BsonDocument filter = new BsonDocument("ip", ip);
             List<BsonDocument> documents = collection.Find(filter).ToList();
@@ -46,7 +46,7 @@ namespace Logging {
         }
 
         public void IncrementNumberOfVisitsIn24Hours(string ip) {
-            IMongoDatabase database = client.GetDatabase("synword");
+            IMongoDatabase database = _client.GetDatabase("synword");
             IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("visits");
             BsonDocument filter = new BsonDocument("ip", ip);
             BsonDocument update = new BsonDocument("$inc", new BsonDocument { { "visitsAllTime", 1 }, { "visitsForTheLastDay", 1 } });

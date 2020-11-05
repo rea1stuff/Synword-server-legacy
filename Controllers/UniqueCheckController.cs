@@ -1,47 +1,40 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using SynWord_Server_CSharp.UniqueCheck;
+using SynWord_Server_CSharp.Logging;
+using SynWord_Server_CSharp.Model.UniqueCheck;
 
-using UniqueCheck;
-using Logging;
-
-namespace SynWord_Server_CSharp.Controllers
-{
+namespace SynWord_Server_CSharp.Controllers {
     [Route("api/[controller]")]
     [ApiController]
-    public class UniqueCheckController : ControllerBase
-    {
-        private static UniqueCheckFromContentWatchAPI uniqueCheckFromAPI = new UniqueCheckFromContentWatchAPI();
-        private static UniqueCheckUsageLog usageLog = new UniqueCheckUsageLog();
+    public class UniqueCheckController : ControllerBase {
+        private UniqueCheckFromContentWatchApi _uniqueCheckFromAPI = new UniqueCheckFromContentWatchApi();
+        private UniqueCheckUsageLog _usageLog = new UniqueCheckUsageLog();
 
-        private int dailyLimit = 10;
-        private int symbolLimit = 20000;
+        private int _dailyLimit = 10;
+        private int _symbolLimit = 20000;
 
         [HttpPost]
-        public async Task<ActionResult> Post([FromBody] UniqueCheckModel uniqueCheck)
-        {
-            try
-            {
-                var clientIP = Request.HttpContext.Connection.RemoteIpAddress.ToString();
-                usageLog.CheckIpExistsIfNotThenCreate(clientIP);
+        public async Task<ActionResult> Post([FromBody] UniqueCheckModel uniqueCheck) {
+            try {
+                string clientIP = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+                _usageLog.CheckIpExistsIfNotThenCreate(clientIP);
 
-                if (symbolLimit < uniqueCheck.text.Length)
-                {
+                if (_symbolLimit < uniqueCheck.Text.Length) {
                     return BadRequest("symbolLimitReached");
                 }
 
-                if (usageLog.GetUsesIn24Hours(clientIP) > dailyLimit)
-                {
+                if (_usageLog.GetUsesIn24Hours(clientIP) > _dailyLimit) {
                     return BadRequest("dailyLimitReached");
                 }
 
-                var response = await uniqueCheckFromAPI.postReqest(uniqueCheck.text);
+                ActionResult response = await _uniqueCheckFromAPI.PostReqest(uniqueCheck.Text);
                 return response;
 
             }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
+            catch (Exception exeption) {
+                return BadRequest(exeption.Message);
             }
         }
     }

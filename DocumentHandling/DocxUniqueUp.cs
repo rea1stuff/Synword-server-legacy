@@ -1,22 +1,21 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
-using Synonymize;
+using SynWord_Server_CSharp.Synonymize;
 
-namespace DocumentUniqueUp
+namespace SynWord_Server_CSharp.DocumentUniqueUp
 {
     public class DocxUniqueUp
     {
-        ISynonymizer synonymizer = new FreeSynonymizer();
+        ISynonymizer _synonymizer = new FreeSynonymizer();
+
         public void UniqueUp(string documentPath)
         {
-            using (WordprocessingDocument doc =
-                  WordprocessingDocument.Open(documentPath, true))
-            {
-                var body = doc.MainDocumentPart.Document.Body;
+            using (WordprocessingDocument document = WordprocessingDocument.Open(documentPath, true)) {
+                Body body = document.MainDocumentPart.Document.Body;
 
-                foreach (var text in body.Descendants<Text>())
+                foreach (Text text in body.Descendants<Text>())
                 {
-                    text.Text = synonymizer.Synonymize(text.Text);
+                    text.Text = _synonymizer.Synonymize(text.Text);
                 }
             }
         }

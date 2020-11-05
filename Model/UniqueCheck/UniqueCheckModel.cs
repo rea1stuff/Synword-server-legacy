@@ -1,9 +1,5 @@
-﻿
-
-namespace UniqueCheck
-{
-    public class UniqueCheckModel
-    {
-        public string text { get; set; }
+﻿namespace SynWord_Server_CSharp.Model.UniqueCheck {
+    public class UniqueCheckModel {
+        public string Text { get; set; }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace Model {
+namespace SynWord_Server_CSharp.Model {
     [Serializable]
     class Synonym {
         public int Id { get; set; }

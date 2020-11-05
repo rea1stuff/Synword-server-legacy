@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Logging;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Synonymize;
+﻿using Microsoft.AspNetCore.Mvc;
+using SynWord_Server_CSharp.Logging;
+using SynWord_Server_CSharp.Synonymize;
 
 namespace SynWord_Server_CSharp.Controllers {
     [Route("api/[controller]")]

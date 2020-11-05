@@ -2,9 +2,9 @@
 using System.Configuration;
 using MongoDB.Driver;
 using MongoDB.Bson;
-using Model;
+using SynWord_Server_CSharp.Model;
 
-namespace Synonymize {
+namespace SynWord_Server_CSharp.Synonymize {
     static class SynonymDictionary {
         static public List<Synonym> dictionary;
 

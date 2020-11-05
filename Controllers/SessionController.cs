@@ -1,23 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SynWord_Server_CSharp.Logging;
 
-using Logging;
-
-namespace SynWord_Server_CSharp.Controllers
-{
+namespace SynWord_Server_CSharp.Controllers {
     [Route("api/[controller]")]
     [ApiController]
-    public class SessionController : ControllerBase
-    {
-
-        private VisitsLog visitation = new VisitsLog();
+    public class SessionController : ControllerBase {
+        private VisitsLog _visitation = new VisitsLog();
 
         [HttpGet]
-        public void Get()
-        {
-            var clientIP = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+        public void Get() {
+            string clientIp = Request.HttpContext.Connection.RemoteIpAddress.ToString();
 
-            visitation.CheckIpExistsIfNotThenCreate(clientIP);
-            visitation.IncrementNumberOfVisitsIn24Hours(clientIP);
+            _visitation.CheckIpExistsIfNotThenCreate(clientIp);
+            _visitation.IncrementNumberOfVisitsIn24Hours(clientIp);
         }
     }
 }

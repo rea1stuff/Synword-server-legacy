@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Model;
+using SynWord_Server_CSharp.Model;
 
-namespace Synonymize {
+namespace SynWord_Server_CSharp.Synonymize {
     class FreeSynonymizer : ISynonymizer {
         public async Task<string> SynonymizeAsync(string text) {
             return await Task.Run(() => Synonymize(text));
@@ -12,7 +12,7 @@ namespace Synonymize {
 
         public string Synonymize(string text) {
             StringBuilder textBuilder = new StringBuilder(text);
-            List<Word> words = GetWordsFromText(text);
+            List<WordModel> words = GetWordsFromText(text);
             int difference = 0;
 
             for (int i = 0; i < words.Count; i++) {
@@ -57,8 +57,8 @@ namespace Synonymize {
             }
         }
 
-        private List<Word> GetWordsFromText(string text) {
-            List<Word> words = new List<Word>();
+        private List<WordModel> GetWordsFromText(string text) {
+            List<WordModel> words = new List<WordModel>();
 
             int start = -1;
 
@@ -69,14 +69,14 @@ namespace Synonymize {
                     }
                 } else {
                     if (new char[] { ' ', '\n', '\r' }.Contains(text[i]) || char.IsPunctuation(text[i])) {
-                        words.Add(new Word(start, i - 1));
+                        words.Add(new WordModel(start, i - 1));
                         start = -1;
                     }
                 }
             }
 
             if (start >= 0) {
-                words.Add(new Word(start, text.Length - 1));
+                words.Add(new WordModel(start, text.Length - 1));
             }
 
             return words;
