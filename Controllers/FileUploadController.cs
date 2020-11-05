@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using SynWord_Server_CSharp.Model;
@@ -13,7 +12,7 @@ namespace SynWord_Server_CSharp.Controllers {
         private IWebHostEnvironment _webHostEnvironment;
         private DocxUniqueUp _docxUniqueUp = new DocxUniqueUp();
 
-        private int _fileID = 0;
+        private int _fileId = 0;
 
         public FileUploadController(IWebHostEnvironment webHostEnvironment) {
             _webHostEnvironment = webHostEnvironment;
@@ -23,7 +22,7 @@ namespace SynWord_Server_CSharp.Controllers {
         public IActionResult Post([FromForm] FileUploadModel objectFile) {
             try {
                 string path = _webHostEnvironment.WebRootPath + @"\Uploaded_Files\";
-                string filePath = path + ++_fileID + "_" + objectFile.Files.FileName;
+                string filePath = path + ++_fileId + "_" + objectFile.Files.FileName;
 
                 if (objectFile.Files.Length < 0 || Path.GetExtension(objectFile.Files.FileName) != ".docx") {
                     return BadRequest("Invalid file extension");
