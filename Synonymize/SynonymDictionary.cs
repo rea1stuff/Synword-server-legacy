@@ -18,8 +18,8 @@ namespace SynWord_Server_CSharp.Synonymize {
             IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("synonyms");
             BsonDocument filter = new BsonDocument();
 
-            List<BsonDocument> synonyms = collection.Find(filter).ToList();
-
+            List<BsonDocument> synonyms = collection.Find(filter).Sort("{ id : 1 }").ToList();
+            
             foreach (BsonDocument synonym in synonyms) {
                 dictionary.Add(new Synonym(synonym["id"].ToInt32(), synonym["word"].ToString(), synonym["synonymId"].ToInt32()));
             }
