@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Configuration;
 using MongoDB.Driver;
@@ -51,6 +52,20 @@ namespace SynWord_Server_CSharp.Logging {
             BsonDocument filter = new BsonDocument("ip", ip);
             BsonDocument update = new BsonDocument("$inc", new BsonDocument { { "visitsAllTime", 1 }, { "visitsForTheLastDay", 1 } });
             collection.UpdateOne(filter, update);
+        }
+
+        public void ResetNumberOfUsesIn24Hours() {
+            IMongoDatabase database = _client.GetDatabase("synword");
+            IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("visits");
+            BsonDocument filter = new BsonDocument();
+
+            List<BsonDocument> documentList = collection.Find(filter).ToList();
+
+            foreach (BsonDocument document in documentList) {
+                filter = new BsonDocument("_id", new ObjectId(Convert.ToString(document["_id"])));
+                BsonDocument update = new BsonDocument("$set", new BsonDocument { {"visitsForTheLastDay", 0} });
+                collection.UpdateOne(filter, update);
+            }
         }
     }
 }

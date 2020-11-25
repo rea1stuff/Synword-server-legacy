@@ -15,7 +15,7 @@ namespace SynWord_Server_CSharp.DocumentUniqueUp
 
                 foreach (Text text in body.Descendants<Text>())
                 {
-                    text.Text = _synonymizer.Synonymize(text.Text);
+                    text.Text = _synonymizer.Synonymize(text.Text).Text;
                 }
             }
         }

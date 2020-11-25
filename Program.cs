@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SynWord_Server_CSharp.Synonymize;
+using SynWord_Server_CSharp.Logging;
 
 namespace SynWord_Server_CSharp
 {
@@ -23,6 +24,7 @@ namespace SynWord_Server_CSharp
                 {
                     webBuilder.UseStartup<Startup>();
                     SynonymDictionary.InitializeDictionary();
+                    Task.Run(() => new MidnightReset().UseReset());
                 });
     }
 }

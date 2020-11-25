@@ -3,16 +3,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SynWord_Server_CSharp.Model;
+using SynWord_Server_CSharp.Model.UniqueUp;
 
 namespace SynWord_Server_CSharp.Synonymize {
     class FreeSynonymizer : ISynonymizer {
-        public async Task<string> SynonymizeAsync(string text) {
+        public async Task<UniqueUpResponseModel> SynonymizeAsync(string text) {
             return await Task.Run(() => Synonymize(text));
         }
 
-        public string Synonymize(string text) {
+        public UniqueUpResponseModel Synonymize(string text) {
             StringBuilder textBuilder = new StringBuilder(text);
             List<WordModel> words = GetWordsFromText(text);
+            List<WordModel> replaced = new List<WordModel>();
             int difference = 0;
 
             for (int i = 0; i < words.Count; i++) {
@@ -29,6 +31,8 @@ namespace SynWord_Server_CSharp.Synonymize {
                     textBuilder.Remove(words[i].StartIndex + difference, words[i].EndIndex + 1 - words[i].StartIndex);
                     textBuilder.Insert(words[i].StartIndex + difference, synonym);
 
+                    replaced.Add(new WordModel(words[i].StartIndex + difference, words[i].StartIndex + difference + synonym.Length - 1));
+
                     int wordLength = words[i].EndIndex + 1 - words[i].StartIndex;
                     int synonymLength = synonym.Length;
 
@@ -36,7 +40,11 @@ namespace SynWord_Server_CSharp.Synonymize {
                 }
             }
 
-            return textBuilder.ToString();
+            UniqueUpResponseModel uniqueUpResponse = new UniqueUpResponseModel();
+            uniqueUpResponse.Text = textBuilder.ToString();
+            uniqueUpResponse.Replaced = replaced.ToArray();
+
+            return uniqueUpResponse;
         }
 
         private int BinarySearch(List<Synonym> synonyms, string word, int left, int right) {

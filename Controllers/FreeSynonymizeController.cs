@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SynWord_Server_CSharp.Logging;
 using SynWord_Server_CSharp.Synonymize;
+using SynWord_Server_CSharp.Model.UniqueUp;
+using Newtonsoft.Json;
 
 namespace SynWord_Server_CSharp.Controllers {
     [Route("api/[controller]")]
@@ -21,11 +23,12 @@ namespace SynWord_Server_CSharp.Controllers {
             
             if (text.Length < 20000) {
                 try {
-                    string content = _freeSynonymizer.Synonymize(text);
+                    UniqueUpResponseModel uniqueUpResponse = _freeSynonymizer.Synonymize(text);
+                    string uniqueUpResponseJson = JsonConvert.SerializeObject(uniqueUpResponse);
 
                     _usageLog.IncrementNumberOfUsesIn24Hours(clientIp);
 
-                    return new ObjectResult(content) {
+                    return new ObjectResult(uniqueUpResponseJson) {
                         StatusCode = 200
                     };
                 } catch {

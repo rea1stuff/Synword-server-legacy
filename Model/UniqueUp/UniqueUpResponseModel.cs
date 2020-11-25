@@ -1,0 +1,10 @@
+﻿using Newtonsoft.Json;
+
+namespace SynWord_Server_CSharp.Model.UniqueUp {
+    public class UniqueUpResponseModel {
+        [JsonProperty("text")]
+        public string Text { get; set; }
+        [JsonProperty("replaced")]
+        public WordModel[] Replaced { get; set; }
+    }
+}
