@@ -3,16 +3,27 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SynWord_Server_CSharp.UniqueCheck;
 using SynWord_Server_CSharp.Logging;
+using SynWord_Server_CSharp.Model;
+using SynWord_Server_CSharp.UserData;
 
 namespace SynWord_Server_CSharp.Controllers {
     [Route("api/[controller]")]
     [ApiController]
     public class UniqueCheckController : ControllerBase {
-        private UniqueCheckFromContentWatchApi _uniqueCheckFromApi = new UniqueCheckFromContentWatchApi();
-        private UniqueCheckUsageLog _usageLog = new UniqueCheckUsageLog();
+        private UniqueCheckFromContentWatchApi _uniqueCheckFromApi;
+        private UniqueCheckUsageLog _usageLog;
+        private GetUserData _getUserData;
+        private SetUserData _setUserData;
+        private UserDataHandle _userDataHandle;
 
         private int _dailyLimit = 10;
         private int _symbolLimit = 20000;
+
+        public UniqueCheckController()
+        {
+            _uniqueCheckFromApi = new UniqueCheckFromContentWatchApi();
+            _usageLog = new UniqueCheckUsageLog();
+        }
 
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] string text) {
@@ -29,10 +40,57 @@ namespace SynWord_Server_CSharp.Controllers {
                 }
 
                 ActionResult response = await _uniqueCheckFromApi.PostReqest(text);
+
+                _usageLog.IncrementNumberOfUsesIn24Hours(clientIp);
+
                 return response;
 
             }
             catch (Exception exeption) {
+                return BadRequest(exeption.Message);
+            }
+        }
+
+        [HttpPost("auth")]
+        public async Task<ActionResult> PostAuth([FromBody] AuthUserModel user)
+        {
+            try
+            {
+                _getUserData = new GetUserData(user.uId);
+                _setUserData = new SetUserData(user.uId);
+                _userDataHandle = new UserDataHandle(user.uId);
+
+                _userDataHandle.CheckUserIdExistIfNotCreate();
+
+                if (_getUserData.is24HoursPassed())
+                {
+                    _userDataHandle.ResetDefaults();
+                }
+
+                string clientIp = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+                _usageLog.CheckIpExistsIfNotThenCreate(clientIp);
+
+                if (user.text.Length > _getUserData.GetUniqueCheckMaxSymbolLimit())
+                {
+                    return BadRequest("symbolLimitReached");
+                }
+
+                int requestsLeft = _getUserData.GetUniqueCheckRequests();
+
+                if (requestsLeft <= 0)
+                {
+                    return BadRequest("dailyLimitReached");
+                }
+
+                ActionResult response = await _uniqueCheckFromApi.PostReqest(user.text);
+
+                _setUserData.SetUniqueCheckRequest(--requestsLeft);
+
+                return response;
+
+            }
+            catch (Exception exeption)
+            {
                 return BadRequest(exeption.Message);
             }
         }
