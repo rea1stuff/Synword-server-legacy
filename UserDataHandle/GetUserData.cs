@@ -28,7 +28,7 @@ namespace SynWord_Server_CSharp.UserData
             {
                 throw new Exception("User data does not exist");
             }
-            return userData.ToJson();
+            return userData[0].ToJson();
         }
 
         public int GetUniqueCheckRequests()
