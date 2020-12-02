@@ -2,7 +2,7 @@
 using DocumentFormat.OpenXml.Wordprocessing;
 using SynWord_Server_CSharp.Synonymize;
 
-namespace SynWord_Server_CSharp.DocumentUniqueUp
+namespace SynWord_Server_CSharp.DocumentHandling.Docx
 {
     public class DocxUniqueUp
     {

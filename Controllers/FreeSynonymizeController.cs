@@ -29,7 +29,7 @@ namespace SynWord_Server_CSharp.Controllers
             string clientIp = Request.HttpContext.Connection.RemoteIpAddress.ToString();
             _usageLog.CheckIpExistsIfNotThenCreate(clientIp);
             
-            if (text.Length < 20000) {
+            if (text.Length < UserLimits.UniqueUpMaxSymbolLimit) {
                 try {
                     UniqueUpResponseModel uniqueUpResponse = _freeSynonymizer.Synonymize(text);
                     string uniqueUpResponseJson = JsonConvert.SerializeObject(uniqueUpResponse);

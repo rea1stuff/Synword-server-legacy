@@ -12,20 +12,23 @@ namespace SynWord_Server_CSharp.UserData
     {
         readonly private IMongoClient _client = new MongoClient(ConfigurationManager.AppSettings["connectionString"]);
         private string uId;
+        private IMongoCollection<BsonDocument> _collection;
+        private List<BsonDocument> _userData;
 
         public SetUserData(string uId)
         {
             this.uId = uId;
+            IMongoDatabase database = _client.GetDatabase("synword");
+            _collection = database.GetCollection<BsonDocument>("userData");
+            var filter = new BsonDocument("uid", uId);
+            _userData = _collection.Find(filter).ToList();
         }
 
         public void SetCreationDateForToday()
         {
-            IMongoDatabase database = _client.GetDatabase("synword");
-            IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("userData");
             var filter = new BsonDocument("uid", uId);
-            List<BsonDocument> user = collection.Find(filter).ToList();
 
-            if (user.Count == 0)
+            if (_userData.Count == 0)
             {
                 throw new Exception("User data does not exist");
             }
@@ -34,7 +37,7 @@ namespace SynWord_Server_CSharp.UserData
 
             var update = Builders<BsonDocument>.Update.Set("creationDate", date);
 
-            collection.UpdateOne(filter, update);
+            _collection.UpdateOne(filter, update);
         }
 
         public void SetUniqueCheckRequest(int count)
@@ -63,40 +66,34 @@ namespace SynWord_Server_CSharp.UserData
 
         private void SetMaxSymbolLimit(String valueName, int count)
         {
-            IMongoDatabase database = _client.GetDatabase("synword");
-            IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("userData");
             var filter = new BsonDocument("uid", uId);
-            List<BsonDocument> user = collection.Find(filter).ToList();
 
-            if (user.Count == 0)
+            if (_userData.Count == 0)
             {
                 throw new Exception("User data does not exist");
             }
 
             var update = Builders<BsonDocument>.Update.Set(valueName, count);
 
-            collection.UpdateOne(filter, update);
+            _collection.UpdateOne(filter, update);
         }
 
         private void SetRequests(String valueName, int count)
         {
-            IMongoDatabase database = _client.GetDatabase("synword");
-            IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("userData");
             var filter = new BsonDocument("uid", uId);
-            List<BsonDocument> user = collection.Find(filter).ToList();
 
-            if (user.Count == 0)
+            if (_userData.Count == 0)
             {
                 throw new Exception("User data does not exist");
             }
 
-            int oldCount = user[0][valueName].ToInt32();
+            int oldCount = _userData[0][valueName].ToInt32();
 
             int newCount = oldCount + count;
 
             var update = Builders<BsonDocument>.Update.Set(valueName, newCount);
 
-            collection.UpdateOne(filter, update);
+            _collection.UpdateOne(filter, update);
         }
     }
 }

@@ -23,19 +23,19 @@ namespace SynWord_Server_CSharp.UserData
             GetUserData getUserData = new GetUserData(uId);
             SetUserData setUserData = new SetUserData(uId);
 
-            if (getUserData.GetUniqueCheckRequests() < 10)
+            if (getUserData.GetUniqueCheckRequests() < UserLimits.UniqueCheckRequests)
             {
-                setUserData.SetUniqueCheckRequest(10);
+                setUserData.SetUniqueCheckRequest(UserLimits.UniqueCheckRequests);
             }
 
-            if (getUserData.GetUniqueUpRequests() < 1000)
+            if (getUserData.GetUniqueUpRequests() < UserLimits.UniqueUpRequests)
             {
-                setUserData.SetUniqueUpRequest(1000);
+                setUserData.SetUniqueUpRequest(UserLimits.UniqueUpRequests);
             }
 
-            if (getUserData.GetDocumentUniqueUpRequests() < 30)
+            if (getUserData.GetDocumentUniqueUpRequests() < UserLimits.DocumentUniqueUpRequests)
             {
-                setUserData.SetDocumentUniqueUpRequests(30);
+                setUserData.SetDocumentUniqueUpRequests(UserLimits.DocumentUniqueUpRequests);
             }
 
             setUserData.SetCreationDateForToday();
@@ -64,11 +64,13 @@ namespace SynWord_Server_CSharp.UserData
             BsonDocument userDataDefaults = new BsonDocument{
                 { "uid",  uId},
                 { "isPremium", false },
-                { "uniqueCheckRequests", 10 },
-                { "uniqueUpRequests", 1000 },
-                { "documentUniqueUpRequests", 30 },
-                { "uniqueCheckMaxSymbolLimit", 20000 },
-                { "uniqueUpMaxSymbolLimit", 20000 },
+                { "uniqueCheckRequests", UserLimits.UniqueCheckRequests },
+                { "uniqueUpRequests", UserLimits.UniqueUpRequests },
+                { "documentUniqueUpRequests", UserLimits.DocumentUniqueUpRequests },
+                { "documentUniqueCheckRequests", UserLimits.DocumentUniqueCheckRequests },
+                { "documentMaxSymbolLimit", UserLimits.DocumentMaxSymbolLimit },
+                { "uniqueCheckMaxSymbolLimit", UserLimits.UniqueCheckMaxSymbolLimit },
+                { "uniqueUpMaxSymbolLimit", UserLimits.UniqueUpMaxSymbolLimit },
                 { "creationDate", date }
             };
             collection.InsertOne(userDataDefaults);

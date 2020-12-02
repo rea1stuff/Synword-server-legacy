@@ -12,23 +12,25 @@ namespace SynWord_Server_CSharp.UserData
     {
         readonly private IMongoClient _client = new MongoClient(ConfigurationManager.AppSettings["connectionString"]);
         private string uId;
+        private List<BsonDocument> _userData;
 
         public GetUserData(string uId) 
         {
             this.uId = uId;
+
+            IMongoDatabase database = _client.GetDatabase("synword");
+            IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("userData");
+            var filter = new BsonDocument("uid", uId);
+            _userData = collection.Find(filter).ToList();
         }
 
         public string GetAllUserData()
         {
-            IMongoDatabase database = _client.GetDatabase("synword");
-            IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("userData");
-            var filter = new BsonDocument("uid", uId);
-            List<BsonDocument> userData = collection.Find(filter).ToList();
-            if (userData.Count == 0)
+            if (_userData.Count == 0)
             {
                 throw new Exception("User data does not exist");
             }
-            return userData[0].ToJson();
+            return _userData[0].ToJson();
         }
 
         public int GetUniqueCheckRequests()
@@ -45,6 +47,10 @@ namespace SynWord_Server_CSharp.UserData
         {
             return Get("documentUniqueUpRequests");
         }
+        public int GetDocumentMaxSymbolLimit()
+        {
+            return Get("documentMaxSymbolLimit");
+        }
         public int GetUniqueCheckMaxSymbolLimit()
         {
             return Get("uniqueCheckMaxSymbolLimit");
@@ -57,12 +63,7 @@ namespace SynWord_Server_CSharp.UserData
 
         public string GetCreationDate()
         {
-            IMongoDatabase database = _client.GetDatabase("synword");
-            IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("userData");
-            var filter = new BsonDocument("uid", uId);
-            List<BsonDocument> user = collection.Find(filter).ToList();
-
-            return user[0]["creationDate"].ToString();
+            return _userData[0]["creationDate"].ToString();
         }
 
         public bool is24HoursPassed()
@@ -75,18 +76,26 @@ namespace SynWord_Server_CSharp.UserData
             return false;
         }
 
+        public bool isPremium()
+        {
+            if (_userData[0]["isPremium"].AsBoolean)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         private int Get(String valueName)
         {
-            IMongoDatabase database = _client.GetDatabase("synword");
-            IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("userData");
-            var filter = new BsonDocument("uid", uId);
-            List<BsonDocument> user = collection.Find(filter).ToList();
-            if (user.Count == 0)
+            if (_userData.Count == 0)
             {
                 throw new Exception("User data does not exist");
             }
 
-            return user[0][valueName].ToInt32();
+            return _userData[0][valueName].ToInt32();
         }
     }
 }

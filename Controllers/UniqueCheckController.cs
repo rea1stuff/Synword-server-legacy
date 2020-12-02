@@ -5,6 +5,8 @@ using SynWord_Server_CSharp.UniqueCheck;
 using SynWord_Server_CSharp.Logging;
 using SynWord_Server_CSharp.Model;
 using SynWord_Server_CSharp.UserData;
+using SynWord_Server_CSharp.Model.UniqueCheck;
+using Newtonsoft.Json;
 
 namespace SynWord_Server_CSharp.Controllers {
     [Route("api/[controller]")]
@@ -15,9 +17,6 @@ namespace SynWord_Server_CSharp.Controllers {
         private GetUserData _getUserData;
         private SetUserData _setUserData;
         private UserDataHandle _userDataHandle;
-
-        private int _dailyLimit = 10;
-        private int _symbolLimit = 20000;
 
         public UniqueCheckController()
         {
@@ -31,20 +30,21 @@ namespace SynWord_Server_CSharp.Controllers {
                 string clientIp = Request.HttpContext.Connection.RemoteIpAddress.ToString();
                 _usageLog.CheckIpExistsIfNotThenCreate(clientIp);
 
-                if (_symbolLimit < text.Length) {
+                if (UserLimits.UniqueCheckMaxSymbolLimit < text.Length) {
                     return BadRequest("symbolLimitReached");
                 }
 
-                if (_usageLog.GetUsesIn24Hours(clientIp) > _dailyLimit) {
+                if (_usageLog.GetUsesIn24Hours(clientIp) > UserLimits.UniqueCheckRequests) {
                     return BadRequest("dailyLimitReached");
                 }
 
-                ActionResult response = await _uniqueCheckFromApi.PostReqest(text);
+                UniqueCheckResponseModel uniqueCheckResponse = await _uniqueCheckFromApi.PostReqest(text);
+
+                string uniqueCheckResponseJson = JsonConvert.SerializeObject(uniqueCheckResponse);
 
                 _usageLog.IncrementNumberOfUsesIn24Hours(clientIp);
 
-                return response;
-
+                return new OkObjectResult(uniqueCheckResponseJson);
             }
             catch (Exception exeption) {
                 return BadRequest(exeption.Message);
@@ -59,16 +59,15 @@ namespace SynWord_Server_CSharp.Controllers {
                 _getUserData = new GetUserData(user.uId);
                 _setUserData = new SetUserData(user.uId);
                 _userDataHandle = new UserDataHandle(user.uId);
+                string clientIp = Request.HttpContext.Connection.RemoteIpAddress.ToString();
 
                 _userDataHandle.CheckUserIdExistIfNotCreate();
+                _usageLog.CheckIpExistsIfNotThenCreate(clientIp);
 
                 if (_getUserData.is24HoursPassed())
                 {
                     _userDataHandle.ResetDefaults();
                 }
-
-                string clientIp = Request.HttpContext.Connection.RemoteIpAddress.ToString();
-                _usageLog.CheckIpExistsIfNotThenCreate(clientIp);
 
                 if (user.text.Length > _getUserData.GetUniqueCheckMaxSymbolLimit())
                 {
@@ -82,11 +81,13 @@ namespace SynWord_Server_CSharp.Controllers {
                     return BadRequest("dailyLimitReached");
                 }
 
-                ActionResult response = await _uniqueCheckFromApi.PostReqest(user.text);
+                UniqueCheckResponseModel uniqueCheckResponse = await _uniqueCheckFromApi.PostReqest(user.text);
+
+                string uniqueCheckResponseJson = JsonConvert.SerializeObject(uniqueCheckResponse);
 
                 _setUserData.SetUniqueCheckRequest(--requestsLeft);
 
-                return response;
+                return new OkObjectResult(uniqueCheckResponseJson);
 
             }
             catch (Exception exeption)

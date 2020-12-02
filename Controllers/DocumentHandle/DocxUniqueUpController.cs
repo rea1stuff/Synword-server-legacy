@@ -3,28 +3,29 @@ using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using SynWord_Server_CSharp.Model.FileUpload;
-using SynWord_Server_CSharp.DocumentUniqueUp;
+using SynWord_Server_CSharp.DocumentHandling.Docx;
 using SynWord_Server_CSharp.Logging;
 using SynWord_Server_CSharp.UserData;
 
 namespace SynWord_Server_CSharp.Controllers {
     [Route("api/[controller]")]
     [ApiController]
-    public class FileUploadController : ControllerBase {
+    public class DocxUniqueUpController : ControllerBase {
         private IWebHostEnvironment _webHostEnvironment;
         private DocxUniqueUp _docxUniqueUp;
+        private DocxLimitsCheck _docxLimitsCheck;
         private FileUploadUsageLog _usageLog;
         private GetUserData _getUserData;
         private SetUserData _setUserData;
         private UserDataHandle _userDataHandle;
 
-        private int _dailyLimit = 5;
         private int _fileId = 0;
 
-        public FileUploadController(IWebHostEnvironment webHostEnvironment) {
+        public DocxUniqueUpController(IWebHostEnvironment webHostEnvironment) {
             _webHostEnvironment = webHostEnvironment;
             _docxUniqueUp = new DocxUniqueUp();
             _usageLog = new FileUploadUsageLog();
+            _docxLimitsCheck = new DocxLimitsCheck();
         }
 
         [HttpPost]
@@ -36,11 +37,16 @@ namespace SynWord_Server_CSharp.Controllers {
                 string path = _webHostEnvironment.WebRootPath + @"\Uploaded_Files\";
                 string filePath = path + ++_fileId + "_" + user.Files.FileName;
 
+                if (_docxLimitsCheck.GetDocSymbolCount(filePath) > UserLimits.DocumentMaxSymbolLimit)
+                {
+                    return BadRequest("document max symbol limit reached");
+                }
+
                 if (user.Files.Length < 0 || Path.GetExtension(user.Files.FileName) != ".docx") {
                     return BadRequest("Invalid file extension");
                 }
 
-                if (_usageLog.GetUsesIn24Hours(clientIp) > _dailyLimit){
+                if (_usageLog.GetUsesIn24Hours(clientIp) > UserLimits.DocumentUniqueUpRequests){
                     return BadRequest("dailyLimitReached");
                 }
 
@@ -70,15 +76,17 @@ namespace SynWord_Server_CSharp.Controllers {
         }
 
         [HttpPost("auth")]
-        public IActionResult PostAuth([FromForm] AuthFileUploadModel user)
+        public IActionResult Authorized([FromForm] AuthFileUploadModel user)
         {
             try
             {
                 _getUserData = new GetUserData(user.uId);
                 _setUserData = new SetUserData(user.uId);
                 _userDataHandle = new UserDataHandle(user.uId);
+                string clientIp = Request.HttpContext.Connection.RemoteIpAddress.ToString();
 
                 _userDataHandle.CheckUserIdExistIfNotCreate();
+                _usageLog.CheckIpExistsIfNotThenCreate(clientIp);
 
                 if (_getUserData.is24HoursPassed())
                 {
@@ -98,7 +106,7 @@ namespace SynWord_Server_CSharp.Controllers {
                 }
 
                 string path = _webHostEnvironment.WebRootPath + @"\Uploaded_Files\";
-                string filePath = path + ++_fileId + "_" + user.Files.FileName;
+                string filePath = path + ++_fileId + "_" + "UniqueUp" + "_" + user.Files.FileName;
 
                 if (!Directory.Exists(path))
                 {
@@ -109,6 +117,11 @@ namespace SynWord_Server_CSharp.Controllers {
                 {
                     user.Files.CopyTo(fileStream);
                     fileStream.Flush();
+                }
+
+                if (_docxLimitsCheck.GetDocSymbolCount(filePath) > _getUserData.GetDocumentMaxSymbolLimit())
+                {
+                    return BadRequest("document max symbol limit reached");
                 }
 
                 _docxUniqueUp.UniqueUp(filePath);
