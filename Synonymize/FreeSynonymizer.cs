@@ -15,6 +15,7 @@ namespace SynWord_Server_CSharp.Synonymize {
             StringBuilder textBuilder = new StringBuilder(text);
             List<WordModel> words = GetWordsFromText(text);
             List<WordModel> replaced = new List<WordModel>();
+            int replacedCount = 0;
             int difference = 0;
 
             for (int i = 0; i < words.Count; i++) {
@@ -37,12 +38,14 @@ namespace SynWord_Server_CSharp.Synonymize {
                     int synonymLength = synonym.Length;
 
                     difference += synonymLength - wordLength;
+                    replacedCount++;
                 }
             }
 
             UniqueUpResponseModel uniqueUpResponse = new UniqueUpResponseModel();
             uniqueUpResponse.Text = textBuilder.ToString();
             uniqueUpResponse.Replaced = replaced.ToArray();
+            uniqueUpResponse.ReplacedCount = replacedCount;
 
             return uniqueUpResponse;
         }

@@ -10,6 +10,7 @@ namespace SynWord_Server_CSharp.Logging {
             
             if (configuration.AppSettings.Settings["lastLogResetDate"].Value == "") {
                 ChangeLastLogResetDate();
+                configuration = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
             }
 
             DateTime lastLogResetDate = DateTime.Parse(string.Format(configuration.AppSettings.Settings["lastLogResetDate"].Value));
