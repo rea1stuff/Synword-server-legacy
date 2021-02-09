@@ -1,5 +1,4 @@
 using System;
-using System.Threading.Tasks;
 using System.Threading;
 using System.Configuration;
 
@@ -15,9 +14,12 @@ namespace SynWord_Server_CSharp.Logging {
 
             DateTime lastLogResetDate = DateTime.Parse(string.Format(configuration.AppSettings.Settings["lastLogResetDate"].Value));
 
+            lastLogResetDate = DateTime.Now.AddDays(-1.5);
+
             if ((DateTime.Now - lastLogResetDate).TotalDays >= 1) {
                 Reset();
                 ChangeLastLogResetDate();
+                lastLogResetDate = DateTime.Parse(string.Format(configuration.AppSettings.Settings["lastLogResetDate"].Value));
             }
 
             while (true) {
