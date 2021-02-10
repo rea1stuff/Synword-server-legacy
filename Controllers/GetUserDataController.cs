@@ -19,10 +19,10 @@ namespace SynWord_Server_CSharp.Controllers
         public ActionResult GetUserData([FromBody] string userId)
         {
             user = new UserDataHandle(userId);
-            getUserData = new GetUserData(userId);
             try
             {
                 user.CheckUserIdExistIfNotCreate();
+                getUserData = new GetUserData(userId);
                 string response = getUserData.GetAllUserData();
                 return Ok(response);
             }

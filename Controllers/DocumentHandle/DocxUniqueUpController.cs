@@ -37,19 +37,6 @@ namespace SynWord_Server_CSharp.Controllers {
                 string path = _webHostEnvironment.WebRootPath + @"\Uploaded_Files\";
                 string filePath = path + ++_fileId + "_" + user.Files.FileName;
 
-                if (_docxLimitsCheck.GetDocSymbolCount(filePath) > UserLimits.DocumentMaxSymbolLimit)
-                {
-                    return BadRequest("document max symbol limit reached");
-                }
-
-                if (user.Files.Length < 0 || Path.GetExtension(user.Files.FileName) != ".docx") {
-                    return BadRequest("Invalid file extension");
-                }
-
-                if (_usageLog.GetUsesIn24Hours(clientIp) > UserLimits.DocumentUniqueUpRequests){
-                    return BadRequest("dailyLimitReached");
-                }
-
                 if (!Directory.Exists(path)) {
                     Directory.CreateDirectory(path);
                 }
@@ -58,7 +45,22 @@ namespace SynWord_Server_CSharp.Controllers {
                     user.Files.CopyTo(fileStream);
                     fileStream.Flush();
                 }
+                /////
+                if (_docxLimitsCheck.GetDocSymbolCount(filePath) > UserLimits.DocumentMaxSymbolLimit)
+                {
+                    return BadRequest("document max symbol limit reached");
+                }
 
+                if (user.Files.Length < 0 || Path.GetExtension(user.Files.FileName) != ".docx")
+                {
+                    return BadRequest("Invalid file extension");
+                }
+
+                if (_usageLog.GetUsesIn24Hours(clientIp) > UserLimits.DocumentUniqueUpRequests)
+                {
+                    return BadRequest("dailyLimitReached");
+                }
+                /////
                 _docxUniqueUp.UniqueUp(filePath);
 
                 string mimeType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
