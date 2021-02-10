@@ -16,14 +16,19 @@ namespace SynWord_Server_CSharp.Controllers.UserDataHandleControllers.SetRequest
     {
         SetUserData _setUserData;
         GetUserData _getUserData;
+        UserDataHandle _userDataHandle;
 
         [HttpPost]
         public ActionResult Post([FromBody] UserPaymentModel payment)
         {
-            _getUserData = new GetUserData(payment.uId);
-            _setUserData = new SetUserData(payment.uId);
             try
             {
+                _userDataHandle = new UserDataHandle(payment.uId);
+                _userDataHandle.CheckUserIdExistIfNotCreate();
+
+                _getUserData = new GetUserData(payment.uId);
+                _setUserData = new SetUserData(payment.uId);
+
                 UserPaymentCheck paymentCheck = new UserPaymentCheck();
                 paymentCheck.PaymentCheck(payment.inAppItemId, payment.purchaseToken);
 

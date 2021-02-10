@@ -15,6 +15,7 @@ namespace SynWord_Server_CSharp.Controllers
         private ISynonymizer _freeSynonymizer;
         private FreeSynonimizerUsageLog _usageLog;
         private GetUserData _getUserData;
+        private SetUserData _setUserData;
         private UserDataHandle _userDataHandle;
 
         public FreeSynonymizeController()
@@ -56,35 +57,42 @@ namespace SynWord_Server_CSharp.Controllers
         {
             try
             {
-                _getUserData = new GetUserData(user.uId);
                 _userDataHandle = new UserDataHandle(user.uId);
-
                 _userDataHandle.CheckUserIdExistIfNotCreate();
+
+                _getUserData = new GetUserData(user.uId);
+                _setUserData = new SetUserData(user.uId);
+
+                string clientIp = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+                _usageLog.CheckIpExistsIfNotThenCreate(clientIp);
 
                 if (_getUserData.is24HoursPassed())
                 {
                     _userDataHandle.ResetDefaults();
                 }
 
-                string clientIp = Request.HttpContext.Connection.RemoteIpAddress.ToString();
-                _usageLog.CheckIpExistsIfNotThenCreate(clientIp);
-
-                if (user.text.Length < _getUserData.GetUniqueUpMaxSymbolLimit())
+                if (user.text.Length > _getUserData.GetUniqueUpMaxSymbolLimit())
                 {
-                    UniqueUpResponseModel uniqueUpResponse = _freeSynonymizer.Synonymize(user.text);
-                    string uniqueUpResponseJson = JsonConvert.SerializeObject(uniqueUpResponse);
-
-                    _usageLog.IncrementNumberOfUsesIn24Hours(clientIp);
-
-                    return new ObjectResult(uniqueUpResponseJson)
-                    {
-                        StatusCode = 200
-                    };
+                    return BadRequest("symbolLimitReached");
                 }
-                else
+
+                int requestsLeft = _getUserData.GetUniqueUpRequests();
+
+                if (requestsLeft <= 0)
                 {
-                    return BadRequest("Exceeded character limit.");
+                    return BadRequest("dailyLimitReached");
                 }
+
+                UniqueUpResponseModel uniqueUpResponse = _freeSynonymizer.Synonymize(user.text);
+                string uniqueUpResponseJson = JsonConvert.SerializeObject(uniqueUpResponse);
+
+                _usageLog.IncrementNumberOfUsesIn24Hours(clientIp);
+                _setUserData.SetUniqueUpRequest(--requestsLeft);
+
+                return new ObjectResult(uniqueUpResponseJson)
+                {
+                    StatusCode = 200
+                };
             }
             catch
             {

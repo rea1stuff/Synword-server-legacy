@@ -38,12 +38,14 @@ namespace SynWord_Server_CSharp.Controllers
         {
             try
             {
+                _userDataHandle = new UserDataHandle(user.uId);
+                _userDataHandle.CheckUserIdExistIfNotCreate();
+
                 _getUserData = new GetUserData(user.uId);
                 _setUserData = new SetUserData(user.uId);
-                _userDataHandle = new UserDataHandle(user.uId);
+
                 string clientIp = Request.HttpContext.Connection.RemoteIpAddress.ToString();
 
-                _userDataHandle.CheckUserIdExistIfNotCreate();
                 _usageLog.CheckIpExistsIfNotThenCreate(clientIp);
 
                 if (!_getUserData.isPremium())
