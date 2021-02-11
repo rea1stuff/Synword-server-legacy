@@ -41,7 +41,6 @@ namespace SynWord_Server_CSharp.UserData
             userData.uniqueCheckRequests = _userData[0]["uniqueCheckRequests"].ToInt32();
             userData.uniqueUpRequests = _userData[0]["uniqueUpRequests"].ToInt32();
             userData.documentUniqueUpRequests = _userData[0]["documentUniqueUpRequests"].ToInt32();
-            userData.documentUniqueCheckRequests = _userData[0]["documentUniqueCheckRequests"].ToInt32();
             userData.documentMaxSymbolLimit = _userData[0]["documentMaxSymbolLimit"].ToInt32();
             userData.uniqueCheckMaxSymbolLimit = _userData[0]["uniqueCheckMaxSymbolLimit"].ToInt32();
             userData.uniqueUpMaxSymbolLimit = _userData[0]["uniqueUpMaxSymbolLimit"].ToInt32();

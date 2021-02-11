@@ -80,15 +80,15 @@ namespace SynWord_Server_CSharp.Controllers
                     Directory.CreateDirectory(path);
                 }
 
-                if (_docxLimitsCheck.GetDocSymbolCount(filePath) > _getUserData.GetDocumentMaxSymbolLimit())
-                {
-                    return BadRequest("document max symbol limit reached");
-                }
-
                 using (FileStream fileStream = System.IO.File.Create(filePath))
                 {
                     user.Files.CopyTo(fileStream);
                     fileStream.Flush();
+                }
+
+                if (_docxLimitsCheck.GetDocSymbolCount(filePath) > _getUserData.GetDocumentMaxSymbolLimit())
+                {
+                    return BadRequest("document max symbol limit reached");
                 }
 
                 UniqueCheckResponseModel uniqueCheckResponse = await _docxUniqueCheck.UniqueCheck();
