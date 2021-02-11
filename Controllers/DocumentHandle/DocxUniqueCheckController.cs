@@ -38,12 +38,14 @@ namespace SynWord_Server_CSharp.Controllers
         {
             try
             {
+                _userDataHandle = new UserDataHandle(user.uId);
+                _userDataHandle.CheckUserIdExistIfNotCreate();
+
                 _getUserData = new GetUserData(user.uId);
                 _setUserData = new SetUserData(user.uId);
-                _userDataHandle = new UserDataHandle(user.uId);
+
                 string clientIp = Request.HttpContext.Connection.RemoteIpAddress.ToString();
 
-                _userDataHandle.CheckUserIdExistIfNotCreate();
                 _usageLog.CheckIpExistsIfNotThenCreate(clientIp);
 
                 if (!_getUserData.isPremium())
@@ -78,15 +80,15 @@ namespace SynWord_Server_CSharp.Controllers
                     Directory.CreateDirectory(path);
                 }
 
-                if (_docxLimitsCheck.GetDocSymbolCount(filePath) > _getUserData.GetDocumentMaxSymbolLimit())
-                {
-                    return BadRequest("document max symbol limit reached");
-                }
-
                 using (FileStream fileStream = System.IO.File.Create(filePath))
                 {
                     user.Files.CopyTo(fileStream);
                     fileStream.Flush();
+                }
+
+                if (_docxLimitsCheck.GetDocSymbolCount(filePath) > _getUserData.GetDocumentMaxSymbolLimit())
+                {
+                    return BadRequest("document max symbol limit reached");
                 }
 
                 UniqueCheckResponseModel uniqueCheckResponse = await _docxUniqueCheck.UniqueCheck();

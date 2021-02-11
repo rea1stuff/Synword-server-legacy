@@ -87,11 +87,7 @@ namespace SynWord_Server_CSharp.UserData
                 throw new Exception("User data does not exist");
             }
 
-            int oldCount = _userData[0][valueName].ToInt32();
-
-            int newCount = oldCount + count;
-
-            var update = Builders<BsonDocument>.Update.Set(valueName, newCount);
+            var update = Builders<BsonDocument>.Update.Set(valueName, count);
 
             _collection.UpdateOne(filter, update);
         }

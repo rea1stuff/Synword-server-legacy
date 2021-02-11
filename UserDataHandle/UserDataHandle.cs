@@ -67,7 +67,6 @@ namespace SynWord_Server_CSharp.UserData
                 { "uniqueCheckRequests", UserLimits.UniqueCheckRequests },
                 { "uniqueUpRequests", UserLimits.UniqueUpRequests },
                 { "documentUniqueUpRequests", UserLimits.DocumentUniqueUpRequests },
-                { "documentUniqueCheckRequests", UserLimits.DocumentUniqueCheckRequests },
                 { "documentMaxSymbolLimit", UserLimits.DocumentMaxSymbolLimit },
                 { "uniqueCheckMaxSymbolLimit", UserLimits.UniqueCheckMaxSymbolLimit },
                 { "uniqueUpMaxSymbolLimit", UserLimits.UniqueUpMaxSymbolLimit },

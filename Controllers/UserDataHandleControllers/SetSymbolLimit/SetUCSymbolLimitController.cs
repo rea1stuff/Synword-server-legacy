@@ -14,13 +14,18 @@ namespace SynWord_Server_CSharp.Controllers.UserDataHandleControllers.SetSymbolL
     public class SetUCSymbolLimitController : ControllerBase
     {
         SetUserData _setUserData;
+        UserDataHandle _userDataHandle;
 
         [HttpPost]
         public ActionResult Post([FromBody] UserPaymentModel payment)
         {
-            _setUserData = new SetUserData(payment.uId);
             try
             {
+                _userDataHandle = new UserDataHandle(payment.uId);
+                _userDataHandle.CheckUserIdExistIfNotCreate();
+
+                _setUserData = new SetUserData(payment.uId);
+
                 UserPaymentCheck paymentCheck = new UserPaymentCheck();
                 paymentCheck.PaymentCheck(payment.inAppItemId, payment.purchaseToken);
 

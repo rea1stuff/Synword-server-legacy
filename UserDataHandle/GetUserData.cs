@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 using System.Configuration;
 using MongoDB.Driver;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
+
+using SynWord_Server_CSharp.Model;
 
 namespace SynWord_Server_CSharp.UserData
 {
@@ -30,7 +33,20 @@ namespace SynWord_Server_CSharp.UserData
             {
                 throw new Exception("User data does not exist");
             }
-            return _userData[0].ToJson();
+
+            UserDataModel userData = new UserDataModel();
+
+            userData.uid = _userData[0]["uid"].ToString();
+            userData.isPremium = _userData[0]["isPremium"].ToBoolean();
+            userData.uniqueCheckRequests = _userData[0]["uniqueCheckRequests"].ToInt32();
+            userData.uniqueUpRequests = _userData[0]["uniqueUpRequests"].ToInt32();
+            userData.documentUniqueUpRequests = _userData[0]["documentUniqueUpRequests"].ToInt32();
+            userData.documentMaxSymbolLimit = _userData[0]["documentMaxSymbolLimit"].ToInt32();
+            userData.uniqueCheckMaxSymbolLimit = _userData[0]["uniqueCheckMaxSymbolLimit"].ToInt32();
+            userData.uniqueUpMaxSymbolLimit = _userData[0]["uniqueUpMaxSymbolLimit"].ToInt32();
+            userData.creationDate = _userData[0]["creationDate"].ToString();
+
+            return userData.ToJson();
         }
 
         public int GetUniqueCheckRequests()

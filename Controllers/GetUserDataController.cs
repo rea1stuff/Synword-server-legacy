@@ -13,16 +13,19 @@ namespace SynWord_Server_CSharp.Controllers
     [ApiController]
     public class GetUserDataController : ControllerBase
     {
-        UserDataHandle user;
         GetUserData getUserData;
+        private UserDataHandle _userDataHandle;
+
         [HttpPost]
         public ActionResult GetUserData([FromBody] string userId)
         {
-            user = new UserDataHandle(userId);
-            getUserData = new GetUserData(userId);
             try
             {
-                user.CheckUserIdExistIfNotCreate();
+                _userDataHandle = new UserDataHandle(userId);
+                _userDataHandle.CheckUserIdExistIfNotCreate();
+
+                getUserData = new GetUserData(userId);
+
                 string response = getUserData.GetAllUserData();
                 return Ok(response);
             }
