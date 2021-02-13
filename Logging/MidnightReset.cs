@@ -14,11 +14,10 @@ namespace SynWord_Server_CSharp.Logging {
 
             DateTime lastLogResetDate = DateTime.Parse(string.Format(configuration.AppSettings.Settings["lastLogResetDate"].Value));
 
-            lastLogResetDate = DateTime.Now.AddDays(-1.5);
-
-            if ((DateTime.Now - lastLogResetDate).TotalDays >= 1) {
+            if (Math.Abs((DateTime.Now - lastLogResetDate).TotalDays) >= 1) {
                 Reset();
                 ChangeLastLogResetDate();
+                configuration = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
                 lastLogResetDate = DateTime.Parse(string.Format(configuration.AppSettings.Settings["lastLogResetDate"].Value));
             }
 
