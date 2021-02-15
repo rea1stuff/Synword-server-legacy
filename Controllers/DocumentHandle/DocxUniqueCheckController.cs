@@ -22,7 +22,7 @@ namespace SynWord_Server_CSharp.Controllers
         private GetUserData _getUserData;
         private SetUserData _setUserData;
         private UserDataHandle _userDataHandle;
-        private DocxLimitsCheck _docxLimitsCheck;
+        private DocxGet _docxLimitsCheck;
 
         private int _fileId = 0;
 
@@ -30,7 +30,7 @@ namespace SynWord_Server_CSharp.Controllers
         {
             _webHostEnvironment = webHostEnvironment;
             _usageLog = new FileUploadUsageLog();
-            _docxLimitsCheck = new DocxLimitsCheck();
+            _docxLimitsCheck = new DocxGet();
         }
 
         [HttpPost("auth")]

@@ -12,7 +12,7 @@ namespace SynWord_Server_CSharp.Controllers {
     [Route("api/[controller]")]
     [ApiController]
     public class UniqueCheckController : ControllerBase {
-        private UniqueCheckFromContentWatchApi _uniqueCheckFromApi;
+        private UniqueCheckApi _uniqueCheckFromApi;
         private UniqueCheckUsageLog _usageLog;
         private GetUserData _getUserData;
         private SetUserData _setUserData;
@@ -20,7 +20,7 @@ namespace SynWord_Server_CSharp.Controllers {
 
         public UniqueCheckController()
         {
-            _uniqueCheckFromApi = new UniqueCheckFromContentWatchApi();
+            _uniqueCheckFromApi = new UniqueCheckApi();
             _usageLog = new UniqueCheckUsageLog();
         }
 
@@ -38,7 +38,7 @@ namespace SynWord_Server_CSharp.Controllers {
                     return BadRequest("dailyLimitReached");
                 }
 
-                UniqueCheckResponseModel uniqueCheckResponse = await _uniqueCheckFromApi.PostReqest(text);
+                UniqueCheckResponseModel uniqueCheckResponse = await _uniqueCheckFromApi.UniqueCheck(text);
 
                 string uniqueCheckResponseJson = JsonConvert.SerializeObject(uniqueCheckResponse);
 
@@ -82,7 +82,7 @@ namespace SynWord_Server_CSharp.Controllers {
                     return BadRequest("dailyLimitReached");
                 }
 
-                UniqueCheckResponseModel uniqueCheckResponse = await _uniqueCheckFromApi.PostReqest(user.text);
+                UniqueCheckResponseModel uniqueCheckResponse = await _uniqueCheckFromApi.UniqueCheck(user.text);
 
                 string uniqueCheckResponseJson = JsonConvert.SerializeObject(uniqueCheckResponse);
 

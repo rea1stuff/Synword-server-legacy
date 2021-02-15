@@ -13,19 +13,19 @@ namespace SynWord_Server_CSharp.Controllers {
     public class DocxUniqueUpController : ControllerBase {
         private IWebHostEnvironment _webHostEnvironment;
         private DocxUniqueUp _docxUniqueUp;
-        private DocxLimitsCheck _docxLimitsCheck;
+        private DocxGet _docxLimitsCheck;
         private FileUploadUsageLog _usageLog;
         private GetUserData _getUserData;
         private SetUserData _setUserData;
         private UserDataHandle _userDataHandle;
 
-        private int _fileId = 0;
+        static private int _fileId = 0;
 
         public DocxUniqueUpController(IWebHostEnvironment webHostEnvironment) {
             _webHostEnvironment = webHostEnvironment;
             _docxUniqueUp = new DocxUniqueUp();
             _usageLog = new FileUploadUsageLog();
-            _docxLimitsCheck = new DocxLimitsCheck();
+            _docxLimitsCheck = new DocxGet();
         }
 
         [HttpPost]

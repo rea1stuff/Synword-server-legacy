@@ -4,7 +4,7 @@ using SynWord_Server_CSharp.UserData;
 
 namespace SynWord_Server_CSharp.DocumentHandling.Docx
 {
-    public class DocxLimitsCheck
+    public class DocxGet
     {
         private int _symbolCount;
         public int GetDocSymbolCount(string documentPath)
@@ -20,6 +20,20 @@ namespace SynWord_Server_CSharp.DocumentHandling.Docx
                 }
             }
             return _symbolCount;
+        }
+        public string GetDocText(string documentPath)
+        {
+            string docText = "";
+            using (WordprocessingDocument document = WordprocessingDocument.Open(documentPath, true))
+            {
+                Body body = document.MainDocumentPart.Document.Body;
+
+                foreach (Text text in body.Descendants<Text>())
+                {
+                    docText += text.Text;
+                }
+            }
+            return docText;
         }
     }
 }
