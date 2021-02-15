@@ -30,6 +30,7 @@ namespace SynWord_Server_CSharp.Controllers {
 
         [HttpPost]
         public IActionResult Post([FromForm] FileUploadModel user) {
+            Console.WriteLine("Request: DocxUniqueUp");
             try {
                 string clientIp = Request.HttpContext.Connection.RemoteIpAddress.ToString();
                 _usageLog.CheckIpExistsIfNotThenCreate(clientIp);
@@ -48,17 +49,17 @@ namespace SynWord_Server_CSharp.Controllers {
                 /////
                 if (_docxLimitsCheck.GetDocSymbolCount(filePath) > UserLimits.DocumentMaxSymbolLimit)
                 {
-                    return BadRequest("document max symbol limit reached");
+                    throw new Exception("document max symbol limit reached");
                 }
 
                 if (user.Files.Length < 0 || Path.GetExtension(user.Files.FileName) != ".docx")
                 {
-                    return BadRequest("Invalid file extension");
+                    throw new Exception("Invalid file extension");
                 }
 
                 if (_usageLog.GetUsesIn24Hours(clientIp) > UserLimits.DocumentUniqueUpRequests)
                 {
-                    return BadRequest("dailyLimitReached");
+                    throw new Exception("dailyLimitReached");
                 }
                 /////
                 _docxUniqueUp.UniqueUp(filePath);
@@ -68,11 +69,14 @@ namespace SynWord_Server_CSharp.Controllers {
 
                 _usageLog.IncrementNumberOfUsesIn24Hours(clientIp);
 
+                Console.WriteLine("Request: DocxUniqueUp [COMPLETED]");
+
                 return new FileStreamResult(stream, mimeType) {
                     FileDownloadName = "Synword_" + user.Files.FileName
                 };
             }
             catch (Exception exception) {
+                Console.WriteLine("Exception: " + exception.Message);
                 return BadRequest(exception.Message);
             }
         }
@@ -80,6 +84,7 @@ namespace SynWord_Server_CSharp.Controllers {
         [HttpPost("auth")]
         public IActionResult Authorized([FromForm] AuthFileUploadModel user)
         {
+            Console.WriteLine("Request: DocxUniqueUpAuth");
             try
             {
                 _userDataHandle = new UserDataHandle(user.uId);
@@ -99,14 +104,14 @@ namespace SynWord_Server_CSharp.Controllers {
 
                 if (user.Files.Length < 0 || Path.GetExtension(user.Files.FileName) != ".docx")
                 {
-                    return BadRequest("Invalid file extension");
+                    throw new Exception("Invalid file extension");
                 }
 
                 int requestsLeft = _getUserData.GetDocumentUniqueUpRequests();
 
                 if (requestsLeft <= 0)
                 {
-                    return BadRequest("dailyLimitReached");
+                    throw new Exception("dailyLimitReached");
                 }
 
                 string path = _webHostEnvironment.WebRootPath + @"\Uploaded_Files\";
@@ -125,7 +130,7 @@ namespace SynWord_Server_CSharp.Controllers {
 
                 if (_docxLimitsCheck.GetDocSymbolCount(filePath) > _getUserData.GetDocumentMaxSymbolLimit())
                 {
-                    return BadRequest("document max symbol limit reached");
+                    throw new Exception("document max symbol limit reached");
                 }
 
                 _docxUniqueUp.UniqueUp(filePath);
@@ -135,6 +140,8 @@ namespace SynWord_Server_CSharp.Controllers {
 
                 _setUserData.SetDocumentUniqueUpRequests(--requestsLeft);
 
+                Console.WriteLine("Request: DocxUniqueUpAuth [COMPLETED]");
+
                 return new FileStreamResult(stream, mimeType)
                 {
                     FileDownloadName = "Synword_" + user.Files.FileName
@@ -142,6 +149,7 @@ namespace SynWord_Server_CSharp.Controllers {
             }
             catch (Exception exception)
             {
+                Console.WriteLine("Exception: " + exception.Message);
                 return BadRequest(exception.Message);
             }
         }

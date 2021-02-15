@@ -24,7 +24,7 @@ namespace SynWord_Server_CSharp.Controllers
         private UserDataHandle _userDataHandle;
         private DocxGet _docxLimitsCheck;
 
-        private int _fileId = 0;
+        static private int _fileId = 0;
 
         public DocxUniqueCheckController(IWebHostEnvironment webHostEnvironment)
         {
@@ -36,6 +36,7 @@ namespace SynWord_Server_CSharp.Controllers
         [HttpPost("auth")]
         public async Task<IActionResult> Authorized([FromForm] AuthFileUploadModel user)
         {
+            Console.WriteLine("Request: DocxUniqueCheck");
             try
             {
                 _userDataHandle = new UserDataHandle(user.uId);
@@ -50,7 +51,7 @@ namespace SynWord_Server_CSharp.Controllers
 
                 if (!_getUserData.isPremium())
                 {
-                    return BadRequest("You do not have access to it");
+                    throw new Exception("You do not have access to it");
                 }
 
                 if (_getUserData.is24HoursPassed())
@@ -60,14 +61,14 @@ namespace SynWord_Server_CSharp.Controllers
 
                 if (user.Files.Length < 0 || Path.GetExtension(user.Files.FileName) != ".docx")
                 {
-                    return BadRequest("Invalid file extension");
+                    throw new Exception("Invalid file extension");
                 }
 
                 int requestsLeft = _getUserData.GetUniqueCheckRequests();
 
                 if (requestsLeft <= 0)
                 {
-                    return BadRequest("dailyLimitReached");
+                    throw new Exception("dailyLimitReached");
                 }
 
                 string path = _webHostEnvironment.WebRootPath + @"\Uploaded_Files\";
@@ -88,7 +89,7 @@ namespace SynWord_Server_CSharp.Controllers
 
                 if (_docxLimitsCheck.GetDocSymbolCount(filePath) > _getUserData.GetDocumentMaxSymbolLimit())
                 {
-                    return BadRequest("document max symbol limit reached");
+                    throw new Exception("document max symbol limit reached");
                 }
 
                 UniqueCheckResponseModel uniqueCheckResponse = await _docxUniqueCheck.UniqueCheck();
@@ -97,10 +98,13 @@ namespace SynWord_Server_CSharp.Controllers
 
                 _setUserData.SetUniqueCheckRequest(--requestsLeft);
 
+                Console.WriteLine("Request: DocxUniqueCheck [COMPLETED]");
+
                 return Ok(response);
             }
             catch (Exception exception)
             {
+                Console.WriteLine("Exception: " + exception.Message);
                 return BadRequest(exception.Message);
             }
         }

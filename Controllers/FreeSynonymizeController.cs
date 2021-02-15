@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using Microsoft.AspNetCore.Mvc;
 using SynWord_Server_CSharp.Logging;
 using SynWord_Server_CSharp.Synonymize;
 using SynWord_Server_CSharp.Model.UniqueUp;
@@ -27,6 +28,7 @@ namespace SynWord_Server_CSharp.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] string text)
         {
+            Console.WriteLine("Request: UniqueUp");
             string clientIp = Request.HttpContext.Connection.RemoteIpAddress.ToString();
             _usageLog.CheckIpExistsIfNotThenCreate(clientIp);
             
@@ -37,12 +39,15 @@ namespace SynWord_Server_CSharp.Controllers
 
                     _usageLog.IncrementNumberOfUsesIn24Hours(clientIp);
 
+                    Console.WriteLine("Request: UniqueUp [COMPLETED]");
+
                     return new ObjectResult(uniqueUpResponseJson) {
                         StatusCode = 200
                     };
                 }
-                catch
+                catch(Exception exception)
                 {
+                    Console.WriteLine("Exception: " + exception.Message);
                     return StatusCode(500);
                 }
             }
@@ -55,6 +60,7 @@ namespace SynWord_Server_CSharp.Controllers
         [HttpPost("auth")]
         public IActionResult PostAuth([FromBody] AuthUserModel user)
         {
+            Console.WriteLine("Request: UniqueUpAuth");
             try
             {
                 _userDataHandle = new UserDataHandle(user.uId);
@@ -73,14 +79,14 @@ namespace SynWord_Server_CSharp.Controllers
 
                 if (user.text.Length > _getUserData.GetUniqueUpMaxSymbolLimit())
                 {
-                    return BadRequest("symbolLimitReached");
+                    throw new Exception("symbolLimitReached");
                 }
 
                 int requestsLeft = _getUserData.GetUniqueUpRequests();
 
                 if (requestsLeft <= 0)
                 {
-                    return BadRequest("dailyLimitReached");
+                    throw new Exception("dailyLimitReached");
                 }
 
                 UniqueUpResponseModel uniqueUpResponse = _freeSynonymizer.Synonymize(user.text);
@@ -89,13 +95,16 @@ namespace SynWord_Server_CSharp.Controllers
                 _usageLog.IncrementNumberOfUsesIn24Hours(clientIp);
                 _setUserData.SetUniqueUpRequest(--requestsLeft);
 
+                System.Console.WriteLine("Request: UniqueUpAuth [COMPLETED]");
+
                 return new ObjectResult(uniqueUpResponseJson)
                 {
                     StatusCode = 200
                 };
             }
-            catch
+            catch(Exception exception)
             {
+                Console.WriteLine("Exception: " + exception.Message);
                 return StatusCode(500);
             }
         }
