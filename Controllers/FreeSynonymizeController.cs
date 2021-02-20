@@ -1,11 +1,13 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using SynWord_Server_CSharp.Logging;
 using SynWord_Server_CSharp.Synonymize;
 using SynWord_Server_CSharp.Model.UniqueUp;
-using Newtonsoft.Json;
 using SynWord_Server_CSharp.Model;
 using SynWord_Server_CSharp.UserData;
+using SynWord_Server_CSharp.Constants;
+using SynWord_Server_CSharp.Exceptions;
 
 namespace SynWord_Server_CSharp.Controllers
 {
@@ -29,31 +31,47 @@ namespace SynWord_Server_CSharp.Controllers
         public IActionResult Post([FromBody] string text)
         {
             Console.WriteLine("Request: UniqueUp");
-            string clientIp = Request.HttpContext.Connection.RemoteIpAddress.ToString();
-            _usageLog.CheckIpExistsIfNotThenCreate(clientIp);
-            
-            if (text.Length < UserLimits.UniqueUpMaxSymbolLimit) {
-                try {
-                    UniqueUpResponseModel uniqueUpResponse = _freeSynonymizer.Synonymize(text);
-                    string uniqueUpResponseJson = JsonConvert.SerializeObject(uniqueUpResponse);
-
-                    _usageLog.IncrementNumberOfUsesIn24Hours(clientIp);
-
-                    Console.WriteLine("Request: UniqueUp [COMPLETED]");
-
-                    return new ObjectResult(uniqueUpResponseJson) {
-                        StatusCode = 200
-                    };
-                }
-                catch(Exception exception)
-                {
-                    Console.WriteLine("Exception: " + exception.Message);
-                    return StatusCode(500);
-                }
-            }
-            else
+            try
             {
-                return BadRequest("Exceeded character limit.");
+                string clientIp = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+                _usageLog.CheckIpExistsIfNotThenCreate(clientIp);
+
+                if (text.Length > UserLimits.UniqueUpMaxSymbolLimit)
+                {
+                    throw new MaxSymbolLimitReachedException();
+                }
+
+                if (_usageLog.GetUsesIn24Hours(clientIp) > UserLimits.UniqueCheckRequests)
+                {
+                    throw new DailyLimitReachedException();
+                }
+
+                UniqueUpResponseModel uniqueUpResponse = _freeSynonymizer.Synonymize(text);
+                string uniqueUpResponseJson = JsonConvert.SerializeObject(uniqueUpResponse);
+
+                _usageLog.IncrementNumberOfUsesIn24Hours(clientIp);
+
+                Console.WriteLine("Request: UniqueUp [COMPLETED]");
+
+                return new ObjectResult(uniqueUpResponseJson)
+                {
+                    StatusCode = 200
+                };
+            }
+            catch (MaxSymbolLimitReachedException exception)
+            {
+                Console.WriteLine("Exception: " + exception.Message);
+                return BadRequest(exception.Message);
+            }
+            catch (DailyLimitReachedException exception)
+            {
+                Console.WriteLine("Exception: " + exception.Message);
+                return BadRequest(exception.Message);
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine("Exception: " + exception.Message);
+                return new StatusCodeResult(500);
             }
         }
 
@@ -79,14 +97,14 @@ namespace SynWord_Server_CSharp.Controllers
 
                 if (user.text.Length > _getUserData.GetUniqueUpMaxSymbolLimit())
                 {
-                    throw new Exception("symbolLimitReached");
+                    throw new MaxSymbolLimitReachedException();
                 }
 
                 int requestsLeft = _getUserData.GetUniqueUpRequests();
 
                 if (requestsLeft <= 0)
                 {
-                    throw new Exception("dailyLimitReached");
+                    throw new DailyLimitReachedException();
                 }
 
                 UniqueUpResponseModel uniqueUpResponse = _freeSynonymizer.Synonymize(user.text);
@@ -102,10 +120,20 @@ namespace SynWord_Server_CSharp.Controllers
                     StatusCode = 200
                 };
             }
-            catch(Exception exception)
+            catch (MaxSymbolLimitReachedException exception)
             {
                 Console.WriteLine("Exception: " + exception.Message);
-                return StatusCode(500);
+                return BadRequest(exception.Message);
+            }
+            catch (DailyLimitReachedException exception)
+            {
+                Console.WriteLine("Exception: " + exception.Message);
+                return BadRequest(exception.Message);
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine("Exception: " + exception.Message);
+                return new StatusCodeResult(500);
             }
         }
     }

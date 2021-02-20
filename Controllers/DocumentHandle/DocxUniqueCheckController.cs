@@ -8,6 +8,8 @@ using SynWord_Server_CSharp.Logging;
 using SynWord_Server_CSharp.UserData;
 using System.Threading.Tasks;
 using SynWord_Server_CSharp.Model.UniqueCheck;
+using SynWord_Server_CSharp.Constants;
+using SynWord_Server_CSharp.Exceptions;
 using Newtonsoft.Json;
 
 namespace SynWord_Server_CSharp.Controllers
@@ -68,7 +70,7 @@ namespace SynWord_Server_CSharp.Controllers
 
                 if (requestsLeft <= 0)
                 {
-                    throw new Exception("dailyLimitReached");
+                    throw new DailyLimitReachedException();
                 }
 
                 string path = _webHostEnvironment.WebRootPath + @"\Uploaded_Files\";
@@ -89,7 +91,7 @@ namespace SynWord_Server_CSharp.Controllers
 
                 if (_docxLimitsCheck.GetDocSymbolCount(filePath) > _getUserData.GetDocumentMaxSymbolLimit())
                 {
-                    throw new Exception("document max symbol limit reached");
+                    throw new MaxSymbolLimitReachedException();
                 }
 
                 UniqueCheckResponseModel uniqueCheckResponse = await _docxUniqueCheck.UniqueCheck();
@@ -102,10 +104,20 @@ namespace SynWord_Server_CSharp.Controllers
 
                 return Ok(response);
             }
-            catch (Exception exception)
+            catch (MaxSymbolLimitReachedException exception)
             {
                 Console.WriteLine("Exception: " + exception.Message);
                 return BadRequest(exception.Message);
+            }
+            catch (DailyLimitReachedException exception)
+            {
+                Console.WriteLine("Exception: " + exception.Message);
+                return BadRequest(exception.Message);
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine("Exception: " + exception.Message);
+                return new StatusCodeResult(500);
             }
         }
     }

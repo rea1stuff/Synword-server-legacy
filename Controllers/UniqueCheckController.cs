@@ -5,7 +5,9 @@ using SynWord_Server_CSharp.UniqueCheck;
 using SynWord_Server_CSharp.Logging;
 using SynWord_Server_CSharp.Model;
 using SynWord_Server_CSharp.UserData;
+using SynWord_Server_CSharp.Constants;
 using SynWord_Server_CSharp.Model.UniqueCheck;
+using SynWord_Server_CSharp.Exceptions;
 using Newtonsoft.Json;
 
 namespace SynWord_Server_CSharp.Controllers {
@@ -32,11 +34,11 @@ namespace SynWord_Server_CSharp.Controllers {
                 _usageLog.CheckIpExistsIfNotThenCreate(clientIp);
 
                 if (UserLimits.UniqueCheckMaxSymbolLimit < text.Length) {
-                    throw new Exception("symbolLimitReached");
+                    throw new MaxSymbolLimitReachedException();
                 }
 
                 if (_usageLog.GetUsesIn24Hours(clientIp) > UserLimits.UniqueCheckRequests) {
-                    throw new Exception("dailyLimitReached");
+                    throw new DailyLimitReachedException();
                 }
 
                 UniqueCheckResponseModel uniqueCheckResponse = await _uniqueCheckFromApi.UniqueCheck(text);
@@ -49,9 +51,20 @@ namespace SynWord_Server_CSharp.Controllers {
 
                 return new OkObjectResult(uniqueCheckResponseJson);
             }
-            catch (Exception exception) {
+            catch (MaxSymbolLimitReachedException exception)
+            {
                 Console.WriteLine("Exception: " + exception.Message);
                 return BadRequest(exception.Message);
+            }
+            catch (DailyLimitReachedException exception)
+            {
+                Console.WriteLine("Exception: " + exception.Message);
+                return BadRequest(exception.Message);
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine("Exception: " + exception.Message);
+                return new StatusCodeResult(500);
             }
         }
 
@@ -77,14 +90,14 @@ namespace SynWord_Server_CSharp.Controllers {
 
                 if (user.text.Length > _getUserData.GetUniqueCheckMaxSymbolLimit())
                 {
-                    throw new Exception("symbolLimitReached");
+                    throw new MaxSymbolLimitReachedException();
                 }
 
                 int requestsLeft = _getUserData.GetUniqueCheckRequests();
 
                 if (requestsLeft <= 0)
                 {
-                    throw new Exception("dailyLimitReached");
+                    throw new DailyLimitReachedException();
                 }
 
                 UniqueCheckResponseModel uniqueCheckResponse = await _uniqueCheckFromApi.UniqueCheck(user.text);
@@ -98,10 +111,20 @@ namespace SynWord_Server_CSharp.Controllers {
                 return new OkObjectResult(uniqueCheckResponseJson);
 
             }
-            catch (Exception exception)
+            catch (MaxSymbolLimitReachedException exception)
             {
                 Console.WriteLine("Exception: " + exception.Message);
                 return BadRequest(exception.Message);
+            }
+            catch (DailyLimitReachedException exception)
+            {
+                Console.WriteLine("Exception: " + exception.Message);
+                return BadRequest(exception.Message);
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine("Exception: " + exception.Message);
+                return new StatusCodeResult(500);
             }
         }
     }

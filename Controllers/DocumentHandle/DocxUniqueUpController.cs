@@ -6,6 +6,8 @@ using SynWord_Server_CSharp.Model.FileUpload;
 using SynWord_Server_CSharp.DocumentHandling.Docx;
 using SynWord_Server_CSharp.Logging;
 using SynWord_Server_CSharp.UserData;
+using SynWord_Server_CSharp.Constants;
+using SynWord_Server_CSharp.Exceptions;
 
 namespace SynWord_Server_CSharp.Controllers {
     [Route("api/[controller]")]
@@ -36,20 +38,25 @@ namespace SynWord_Server_CSharp.Controllers {
                 _usageLog.CheckIpExistsIfNotThenCreate(clientIp);
 
                 string path = _webHostEnvironment.WebRootPath + @"\Uploaded_Files\";
-                string filePath = path + ++_fileId + "_" + user.Files.FileName;
+                string filePath = path + ++_fileId + "_" + "UniqueUp" + "_" + user.Files.FileName;
 
                 if (!Directory.Exists(path)) {
                     Directory.CreateDirectory(path);
+                }
+
+                if (_usageLog.GetUsesIn24Hours(clientIp) > UserLimits.DocumentUniqueUpRequests)
+                {
+                    throw new DailyLimitReachedException();
                 }
 
                 using (FileStream fileStream = System.IO.File.Create(filePath)) {
                     user.Files.CopyTo(fileStream);
                     fileStream.Flush();
                 }
-                /////
+
                 if (_docxLimitsCheck.GetDocSymbolCount(filePath) > UserLimits.DocumentMaxSymbolLimit)
                 {
-                    throw new Exception("document max symbol limit reached");
+                    throw new MaxSymbolLimitReachedException();
                 }
 
                 if (user.Files.Length < 0 || Path.GetExtension(user.Files.FileName) != ".docx")
@@ -57,11 +64,6 @@ namespace SynWord_Server_CSharp.Controllers {
                     throw new Exception("Invalid file extension");
                 }
 
-                if (_usageLog.GetUsesIn24Hours(clientIp) > UserLimits.DocumentUniqueUpRequests)
-                {
-                    throw new Exception("dailyLimitReached");
-                }
-                /////
                 _docxUniqueUp.UniqueUp(filePath);
 
                 string mimeType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
@@ -75,9 +77,20 @@ namespace SynWord_Server_CSharp.Controllers {
                     FileDownloadName = "Synword_" + user.Files.FileName
                 };
             }
-            catch (Exception exception) {
+            catch (MaxSymbolLimitReachedException exception)
+            {
                 Console.WriteLine("Exception: " + exception.Message);
                 return BadRequest(exception.Message);
+            }
+            catch (DailyLimitReachedException exception)
+            {
+                Console.WriteLine("Exception: " + exception.Message);
+                return BadRequest(exception.Message);
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine("Exception: " + exception.Message);
+                return new StatusCodeResult(500);
             }
         }
 
@@ -111,7 +124,7 @@ namespace SynWord_Server_CSharp.Controllers {
 
                 if (requestsLeft <= 0)
                 {
-                    throw new Exception("dailyLimitReached");
+                    throw new DailyLimitReachedException();
                 }
 
                 string path = _webHostEnvironment.WebRootPath + @"\Uploaded_Files\";
@@ -130,7 +143,7 @@ namespace SynWord_Server_CSharp.Controllers {
 
                 if (_docxLimitsCheck.GetDocSymbolCount(filePath) > _getUserData.GetDocumentMaxSymbolLimit())
                 {
-                    throw new Exception("document max symbol limit reached");
+                    throw new MaxSymbolLimitReachedException();
                 }
 
                 _docxUniqueUp.UniqueUp(filePath);
@@ -147,10 +160,20 @@ namespace SynWord_Server_CSharp.Controllers {
                     FileDownloadName = "Synword_" + user.Files.FileName
                 };
             }
-            catch (Exception exception)
+            catch (MaxSymbolLimitReachedException exception)
             {
                 Console.WriteLine("Exception: " + exception.Message);
                 return BadRequest(exception.Message);
+            }
+            catch (DailyLimitReachedException exception)
+            {
+                Console.WriteLine("Exception: " + exception.Message);
+                return BadRequest(exception.Message);
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine("Exception: " + exception.Message);
+                return new StatusCodeResult(500);
             }
         }
     }
