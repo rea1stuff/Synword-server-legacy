@@ -15,38 +15,34 @@ namespace SynWord_Server_CSharp.UserData
     {
         readonly private IMongoClient _client = new MongoClient(ConfigurationManager.AppSettings["connectionString"]);
         private string uId;
-        private List<BsonDocument> _userData;
 
         public GetUserData(string uId) 
         {
             this.uId = uId;
-
-            IMongoDatabase database = _client.GetDatabase("synword");
-            IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("userData");
-            var filter = new BsonDocument("uid", uId);
-            _userData = collection.Find(filter).ToList();
         }
 
         public string GetAllUserData()
         {
-            if (_userData.Count == 0)
+            List<BsonDocument> userData = GetData();
+
+            if (userData.Count == 0)
             {
                 throw new Exception("User data does not exist");
             }
 
-            UserDataModel userData = new UserDataModel();
+            UserDataModel userDataModel = new UserDataModel();
 
-            userData.uid = _userData[0]["uid"].ToString();
-            userData.isPremium = _userData[0]["isPremium"].ToBoolean();
-            userData.uniqueCheckRequests = _userData[0]["uniqueCheckRequests"].ToInt32();
-            userData.uniqueUpRequests = _userData[0]["uniqueUpRequests"].ToInt32();
-            userData.documentUniqueUpRequests = _userData[0]["documentUniqueUpRequests"].ToInt32();
-            userData.documentMaxSymbolLimit = _userData[0]["documentMaxSymbolLimit"].ToInt32();
-            userData.uniqueCheckMaxSymbolLimit = _userData[0]["uniqueCheckMaxSymbolLimit"].ToInt32();
-            userData.uniqueUpMaxSymbolLimit = _userData[0]["uniqueUpMaxSymbolLimit"].ToInt32();
-            userData.creationDate = _userData[0]["creationDate"].ToString();
+            userDataModel.uId = userData[0]["uId"].ToString();
+            userDataModel.isPremium = userData[0]["isPremium"].ToBoolean();
+            userDataModel.uniqueCheckRequests = userData[0]["uniqueCheckRequests"].ToInt32();
+            userDataModel.uniqueUpRequests = userData[0]["uniqueUpRequests"].ToInt32();
+            userDataModel.documentUniqueUpRequests = userData[0]["documentUniqueUpRequests"].ToInt32();
+            userDataModel.documentMaxSymbolLimit = userData[0]["documentMaxSymbolLimit"].ToInt32();
+            userDataModel.uniqueCheckMaxSymbolLimit = userData[0]["uniqueCheckMaxSymbolLimit"].ToInt32();
+            userDataModel.uniqueUpMaxSymbolLimit = userData[0]["uniqueUpMaxSymbolLimit"].ToInt32();
+            userDataModel.creationDate = userData[0]["creationDate"].ToString();
 
-            return userData.ToJson();
+            return userDataModel.ToJson();
         }
 
         public int GetUniqueCheckRequests()
@@ -79,22 +75,16 @@ namespace SynWord_Server_CSharp.UserData
 
         public string GetCreationDate()
         {
-            return _userData[0]["creationDate"].ToString();
-        }
+            List<BsonDocument> userData = GetData();
 
-        public bool is24HoursPassed()
-        {
-            DateTime inputDate = DateTime.Parse(GetCreationDate());
-            if ((DateTime.Now - inputDate) > new TimeSpan(24, 0, 0))
-            {
-                return true;
-            }
-            return false;
+            return userData[0]["creationDate"].ToString();
         }
 
         public bool isPremium()
         {
-            if (_userData[0]["isPremium"].AsBoolean)
+            List<BsonDocument> userData = GetData();
+
+            if (userData[0]["isPremium"].AsBoolean)
             {
                 return true;
             }
@@ -104,14 +94,25 @@ namespace SynWord_Server_CSharp.UserData
             }
         }
 
-        private int Get(String valueName)
+        private int Get(string valueName)
         {
-            if (_userData.Count == 0)
+            List<BsonDocument> userData = GetData();
+
+            if (userData.Count == 0)
             {
                 throw new Exception("User data does not exist");
             }
 
-            return _userData[0][valueName].ToInt32();
+            return userData[0][valueName].ToInt32();
+        }
+
+        private List<BsonDocument> GetData()
+        {
+            IMongoDatabase database = _client.GetDatabase("synword");
+            IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("userData");
+            var filter = new BsonDocument("uId", uId);
+            List<BsonDocument> userData = collection.Find(filter).ToList();
+            return userData;
         }
     }
 }

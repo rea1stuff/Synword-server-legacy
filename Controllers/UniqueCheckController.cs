@@ -9,6 +9,7 @@ using SynWord_Server_CSharp.Constants;
 using SynWord_Server_CSharp.Model.UniqueCheck;
 using SynWord_Server_CSharp.Exceptions;
 using Newtonsoft.Json;
+using SynWord_Server_CSharp.GoogleApi;
 
 namespace SynWord_Server_CSharp.Controllers {
     [Route("api/[controller]")]
@@ -19,6 +20,7 @@ namespace SynWord_Server_CSharp.Controllers {
         private GetUserData _getUserData;
         private SetUserData _setUserData;
         private UserDataHandle _userDataHandle;
+        private GoogleOauth2Api _googleApi = new GoogleOauth2Api();
 
         public UniqueCheckController()
         {
@@ -64,7 +66,10 @@ namespace SynWord_Server_CSharp.Controllers {
             catch (Exception exception)
             {
                 Console.WriteLine("Exception: " + exception.Message);
-                return new StatusCodeResult(500);
+                return new ObjectResult(exception.Message)
+                {
+                    StatusCode = 500
+                };
             }
         }
 
@@ -74,18 +79,14 @@ namespace SynWord_Server_CSharp.Controllers {
             Console.WriteLine("Request: UniqueCheckAuth");
             try
             {
-                _userDataHandle = new UserDataHandle(user.uId);
-                _userDataHandle.CheckUserIdExistIfNotCreate();
+                string uId = _googleApi.GetUserId(user.accessToken);
+                _userDataHandle = new UserDataHandle(uId);
+                _getUserData = new GetUserData(uId);
+                _setUserData = new SetUserData(uId);
 
-                _getUserData = new GetUserData(user.uId);
-                _setUserData = new SetUserData(user.uId);
-                string clientIp = Request.HttpContext.Connection.RemoteIpAddress.ToString();
-
-                _usageLog.CheckIpExistsIfNotThenCreate(clientIp);
-
-                if (_getUserData.is24HoursPassed())
+                if (!_userDataHandle.IsUserExist())
                 {
-                    _userDataHandle.ResetDefaults();
+                    throw new UserDoesNotExistException();
                 }
 
                 if (user.text.Length > _getUserData.GetUniqueCheckMaxSymbolLimit())
@@ -111,20 +112,28 @@ namespace SynWord_Server_CSharp.Controllers {
                 return new OkObjectResult(uniqueCheckResponseJson);
 
             }
-            catch (MaxSymbolLimitReachedException exception)
+            catch (MaxSymbolLimitReachedException ex)
             {
-                Console.WriteLine("Exception: " + exception.Message);
-                return BadRequest(exception.Message);
+                Console.WriteLine("Exception: " + ex.Message);
+                return BadRequest(ex.Message);
             }
-            catch (DailyLimitReachedException exception)
+            catch (DailyLimitReachedException ex)
             {
-                Console.WriteLine("Exception: " + exception.Message);
-                return BadRequest(exception.Message);
+                Console.WriteLine("Exception: " + ex.Message);
+                return BadRequest(ex.Message);
             }
-            catch (Exception exception)
+            catch (UserDoesNotExistException ex) 
             {
-                Console.WriteLine("Exception: " + exception.Message);
-                return new StatusCodeResult(500);
+                Console.WriteLine("Exception: " + ex.Message);
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception: " + ex.Message);
+                return new ObjectResult(ex.Message)
+                {
+                    StatusCode = 500
+                };
             }
         }
     }

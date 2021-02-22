@@ -12,32 +12,28 @@ namespace SynWord_Server_CSharp.UserData
     {
         readonly private IMongoClient _client = new MongoClient(ConfigurationManager.AppSettings["connectionString"]);
         private string uId;
-        private IMongoCollection<BsonDocument> _collection;
-        private List<BsonDocument> _userData;
 
         public SetUserData(string uId)
         {
             this.uId = uId;
-            IMongoDatabase database = _client.GetDatabase("synword");
-            _collection = database.GetCollection<BsonDocument>("userData");
-            var filter = new BsonDocument("uid", uId);
-            _userData = _collection.Find(filter).ToList();
         }
 
-        public void SetCreationDateForToday()
+        public void SetPremium()
         {
-            var filter = new BsonDocument("uid", uId);
+            List<BsonDocument> userData = GetData();
 
-            if (_userData.Count == 0)
+            var filter = new BsonDocument("uId", uId);
+
+            if (userData.Count == 0)
             {
                 throw new Exception("User data does not exist");
             }
 
-            string date = DateTime.Now.ToString();
+            var update = Builders<BsonDocument>.Update.Set("isPremium", true);
 
-            var update = Builders<BsonDocument>.Update.Set("creationDate", date);
+            IMongoCollection<BsonDocument> collection = GetCollection();
 
-            _collection.UpdateOne(filter, update);
+            collection.UpdateOne(filter, update);
         }
 
         public void SetUniqueCheckRequest(int count)
@@ -66,30 +62,54 @@ namespace SynWord_Server_CSharp.UserData
 
         private void SetMaxSymbolLimit(String valueName, int count)
         {
-            var filter = new BsonDocument("uid", uId);
+            List<BsonDocument> userData = GetData();
 
-            if (_userData.Count == 0)
+            var filter = new BsonDocument("uId", uId);
+
+            if (userData.Count == 0)
             {
                 throw new Exception("User data does not exist");
             }
 
             var update = Builders<BsonDocument>.Update.Set(valueName, count);
 
-            _collection.UpdateOne(filter, update);
+            IMongoCollection<BsonDocument> collection = GetCollection();
+
+            collection.UpdateOne(filter, update);
         }
 
         private void SetRequests(String valueName, int count)
         {
-            var filter = new BsonDocument("uid", uId);
+            List<BsonDocument> userData = GetData();
 
-            if (_userData.Count == 0)
+            var filter = new BsonDocument("uId", uId);
+
+            if (userData.Count == 0)
             {
                 throw new Exception("User data does not exist");
             }
 
             var update = Builders<BsonDocument>.Update.Set(valueName, count);
 
-            _collection.UpdateOne(filter, update);
+            IMongoCollection<BsonDocument> collection = GetCollection();
+
+            collection.UpdateOne(filter, update);
+        }
+
+        private List<BsonDocument> GetData()
+        {
+            IMongoDatabase database = _client.GetDatabase("synword");
+            IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("userData");
+            var filter = new BsonDocument("uId", uId);
+            List<BsonDocument> _userData = collection.Find(filter).ToList();
+            return _userData;
+        }
+
+        private IMongoCollection<BsonDocument> GetCollection()
+        {
+            IMongoDatabase database = _client.GetDatabase("synword");
+            IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("userData");
+            return collection;
         }
     }
 }

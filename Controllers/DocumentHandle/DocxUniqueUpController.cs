@@ -8,6 +8,7 @@ using SynWord_Server_CSharp.Logging;
 using SynWord_Server_CSharp.UserData;
 using SynWord_Server_CSharp.Constants;
 using SynWord_Server_CSharp.Exceptions;
+using SynWord_Server_CSharp.GoogleApi;
 
 namespace SynWord_Server_CSharp.Controllers {
     [Route("api/[controller]")]
@@ -20,14 +21,19 @@ namespace SynWord_Server_CSharp.Controllers {
         private GetUserData _getUserData;
         private SetUserData _setUserData;
         private UserDataHandle _userDataHandle;
+        private GoogleOauth2Api _googleApi = new GoogleOauth2Api();
 
-        static private int _fileId = 0;
+        static private int counter = 0;
+        private int _fileId;
 
         public DocxUniqueUpController(IWebHostEnvironment webHostEnvironment) {
             _webHostEnvironment = webHostEnvironment;
             _docxUniqueUp = new DocxUniqueUp();
             _usageLog = new FileUploadUsageLog();
             _docxLimitsCheck = new DocxGet();
+
+            counter++;
+            _fileId = counter;
         }
 
         [HttpPost]
@@ -38,7 +44,7 @@ namespace SynWord_Server_CSharp.Controllers {
                 _usageLog.CheckIpExistsIfNotThenCreate(clientIp);
 
                 string path = _webHostEnvironment.WebRootPath + @"\Uploaded_Files\";
-                string filePath = path + ++_fileId + "_" + "UniqueUp" + "_" + user.Files.FileName;
+                string filePath = path + _fileId + "_" + "UniqueUp" + "_" + user.Files.FileName;
 
                 if (!Directory.Exists(path)) {
                     Directory.CreateDirectory(path);
@@ -90,7 +96,10 @@ namespace SynWord_Server_CSharp.Controllers {
             catch (Exception exception)
             {
                 Console.WriteLine("Exception: " + exception.Message);
-                return new StatusCodeResult(500);
+                return new ObjectResult(exception.Message)
+                {
+                    StatusCode = 500
+                };
             }
         }
 
@@ -100,19 +109,14 @@ namespace SynWord_Server_CSharp.Controllers {
             Console.WriteLine("Request: DocxUniqueUpAuth");
             try
             {
-                _userDataHandle = new UserDataHandle(user.uId);
-                _userDataHandle.CheckUserIdExistIfNotCreate();
+                string uId = _googleApi.GetUserId(user.accessToken);
+                _userDataHandle = new UserDataHandle(uId);
+                _getUserData = new GetUserData(uId);
+                _setUserData = new SetUserData(uId);
 
-                _getUserData = new GetUserData(user.uId);
-                _setUserData = new SetUserData(user.uId);
-
-                string clientIp = Request.HttpContext.Connection.RemoteIpAddress.ToString();
-
-                _usageLog.CheckIpExistsIfNotThenCreate(clientIp);
-
-                if (_getUserData.is24HoursPassed())
+                if (!_userDataHandle.IsUserExist())
                 {
-                    _userDataHandle.ResetDefaults();
+                    throw new UserDoesNotExistException();
                 }
 
                 if (user.Files.Length < 0 || Path.GetExtension(user.Files.FileName) != ".docx")
@@ -128,7 +132,7 @@ namespace SynWord_Server_CSharp.Controllers {
                 }
 
                 string path = _webHostEnvironment.WebRootPath + @"\Uploaded_Files\";
-                string filePath = path + ++_fileId + "_" + "UniqueUp" + "_" + user.Files.FileName;
+                string filePath = path + _fileId + "_" + "UniqueUp" + "_" + user.Files.FileName;
 
                 if (!Directory.Exists(path))
                 {
@@ -173,7 +177,10 @@ namespace SynWord_Server_CSharp.Controllers {
             catch (Exception exception)
             {
                 Console.WriteLine("Exception: " + exception.Message);
-                return new StatusCodeResult(500);
+                return new ObjectResult(exception.Message)
+                {
+                    StatusCode = 500
+                };
             }
         }
     }

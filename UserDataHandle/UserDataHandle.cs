@@ -6,12 +6,14 @@ using System.Configuration;
 using MongoDB.Driver;
 using MongoDB.Bson;
 using SynWord_Server_CSharp.Constants;
+using SynWord_Server_CSharp.GoogleApi;
 
 namespace SynWord_Server_CSharp.UserData
 {
     public class UserDataHandle
     {
-        readonly private IMongoClient _client = new MongoClient(ConfigurationManager.AppSettings["connectionString"]);
+        readonly IMongoClient _client = new MongoClient(ConfigurationManager.AppSettings["connectionString"]);
+        GoogleOauth2Api _googleApi = new GoogleOauth2Api();
         string uId;
 
         public UserDataHandle(string uId)
@@ -19,43 +21,39 @@ namespace SynWord_Server_CSharp.UserData
             this.uId = uId;
         }
 
-        public void ResetDefaults() 
-        {
-            GetUserData getUserData = new GetUserData(uId);
-            SetUserData setUserData = new SetUserData(uId);
+        //public void ResetDefaults()
+        //{
+        //    if (_getUserData.GetUniqueCheckRequests() < UserLimits.UniqueCheckRequests)
+        //    {
+        //        _setUserData.SetUniqueCheckRequest(UserLimits.UniqueCheckRequests);
+        //    }
 
-            if (getUserData.GetUniqueCheckRequests() < UserLimits.UniqueCheckRequests)
-            {
-                setUserData.SetUniqueCheckRequest(UserLimits.UniqueCheckRequests);
-            }
+        //    if (_getUserData.GetUniqueUpRequests() < UserLimits.UniqueUpRequests)
+        //    {
+        //        _setUserData.SetUniqueUpRequest(UserLimits.UniqueUpRequests);
+        //    }
 
-            if (getUserData.GetUniqueUpRequests() < UserLimits.UniqueUpRequests)
-            {
-                setUserData.SetUniqueUpRequest(UserLimits.UniqueUpRequests);
-            }
+        //    if (_getUserData.GetDocumentUniqueUpRequests() < UserLimits.DocumentUniqueUpRequests)
+        //    {
+        //        _setUserData.SetDocumentUniqueUpRequests(UserLimits.DocumentUniqueUpRequests);
+        //    }
+        //}
 
-            if (getUserData.GetDocumentUniqueUpRequests() < UserLimits.DocumentUniqueUpRequests)
-            {
-                setUserData.SetDocumentUniqueUpRequests(UserLimits.DocumentUniqueUpRequests);
-            }
-
-            setUserData.SetCreationDateForToday();
-        }
-
-        public void CheckUserIdExistIfNotCreate()
+        public bool IsUserExist()
         {
             IMongoDatabase database = _client.GetDatabase("synword");
             IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("userData");
-            var filter = new BsonDocument("uid", uId);
+            var filter = new BsonDocument("uId", uId);
             List<BsonDocument> userData = collection.Find(filter).ToList();
 
             if (userData.Count == 0)
             {
-                UploadIdToDB();
+                return false;
             }
-        }
 
-        private void UploadIdToDB()
+            return true;
+        }
+        public void CreateUser()
         {
             IMongoDatabase database = _client.GetDatabase("synword");
             IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("userData");
@@ -63,7 +61,7 @@ namespace SynWord_Server_CSharp.UserData
             string date = DateTime.Now.ToString();
 
             BsonDocument userDataDefaults = new BsonDocument{
-                { "uid",  uId},
+                { "uId",  uId},
                 { "isPremium", false },
                 { "uniqueCheckRequests", UserLimits.UniqueCheckRequests },
                 { "uniqueUpRequests", UserLimits.UniqueUpRequests },
@@ -75,6 +73,5 @@ namespace SynWord_Server_CSharp.UserData
             };
             collection.InsertOne(userDataDefaults);
         }
-
     }
 }

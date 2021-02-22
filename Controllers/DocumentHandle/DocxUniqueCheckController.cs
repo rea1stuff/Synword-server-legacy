@@ -11,6 +11,7 @@ using SynWord_Server_CSharp.Model.UniqueCheck;
 using SynWord_Server_CSharp.Constants;
 using SynWord_Server_CSharp.Exceptions;
 using Newtonsoft.Json;
+using SynWord_Server_CSharp.GoogleApi;
 
 namespace SynWord_Server_CSharp.Controllers
 {
@@ -25,14 +26,19 @@ namespace SynWord_Server_CSharp.Controllers
         private SetUserData _setUserData;
         private UserDataHandle _userDataHandle;
         private DocxGet _docxLimitsCheck;
+        private GoogleOauth2Api _googleApi = new GoogleOauth2Api();
 
-        static private int _fileId = 0;
+        static private int counter = 0;
+        private int _fileId;
 
         public DocxUniqueCheckController(IWebHostEnvironment webHostEnvironment)
         {
             _webHostEnvironment = webHostEnvironment;
             _usageLog = new FileUploadUsageLog();
             _docxLimitsCheck = new DocxGet();
+
+            counter++;
+            _fileId = counter;
         }
 
         [HttpPost("auth")]
@@ -41,24 +47,19 @@ namespace SynWord_Server_CSharp.Controllers
             Console.WriteLine("Request: DocxUniqueCheck");
             try
             {
-                _userDataHandle = new UserDataHandle(user.uId);
-                _userDataHandle.CheckUserIdExistIfNotCreate();
+                string uId = _googleApi.GetUserId(user.accessToken);
+                _userDataHandle = new UserDataHandle(uId);
+                _getUserData = new GetUserData(uId);
+                _setUserData = new SetUserData(uId);
 
-                _getUserData = new GetUserData(user.uId);
-                _setUserData = new SetUserData(user.uId);
-
-                string clientIp = Request.HttpContext.Connection.RemoteIpAddress.ToString();
-
-                _usageLog.CheckIpExistsIfNotThenCreate(clientIp);
+                if (!_userDataHandle.IsUserExist())
+                {
+                    throw new UserDoesNotExistException();
+                }
 
                 if (!_getUserData.isPremium())
                 {
                     throw new Exception("You do not have access to it");
-                }
-
-                if (_getUserData.is24HoursPassed())
-                {
-                    _userDataHandle.ResetDefaults();
                 }
 
                 if (user.Files.Length < 0 || Path.GetExtension(user.Files.FileName) != ".docx")
@@ -74,7 +75,7 @@ namespace SynWord_Server_CSharp.Controllers
                 }
 
                 string path = _webHostEnvironment.WebRootPath + @"\Uploaded_Files\";
-                string filePath = path + ++_fileId + "_" + "UniqueCheck" + "_" + user.Files.FileName;
+                string filePath = path + _fileId + "_" + "UniqueCheck" + "_" + user.Files.FileName;
 
                 _docxUniqueCheck = new DocxUniqueCheck(filePath);
 
@@ -114,10 +115,18 @@ namespace SynWord_Server_CSharp.Controllers
                 Console.WriteLine("Exception: " + exception.Message);
                 return BadRequest(exception.Message);
             }
+            catch (UserDoesNotExistException ex)
+            {
+                Console.WriteLine("Exception: " + ex.Message);
+                return BadRequest(ex.Message);
+            }
             catch (Exception exception)
             {
                 Console.WriteLine("Exception: " + exception.Message);
-                return new StatusCodeResult(500);
+                return new ObjectResult(exception.Message)
+                {
+                    StatusCode = 500
+                };
             }
         }
     }

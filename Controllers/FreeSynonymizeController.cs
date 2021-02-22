@@ -8,6 +8,7 @@ using SynWord_Server_CSharp.Model;
 using SynWord_Server_CSharp.UserData;
 using SynWord_Server_CSharp.Constants;
 using SynWord_Server_CSharp.Exceptions;
+using SynWord_Server_CSharp.GoogleApi;
 
 namespace SynWord_Server_CSharp.Controllers
 {
@@ -20,6 +21,7 @@ namespace SynWord_Server_CSharp.Controllers
         private GetUserData _getUserData;
         private SetUserData _setUserData;
         private UserDataHandle _userDataHandle;
+        private GoogleOauth2Api _googleApi = new GoogleOauth2Api();
 
         public FreeSynonymizeController()
         {
@@ -71,7 +73,10 @@ namespace SynWord_Server_CSharp.Controllers
             catch (Exception exception)
             {
                 Console.WriteLine("Exception: " + exception.Message);
-                return new StatusCodeResult(500);
+                return new ObjectResult(exception.Message)
+                {
+                    StatusCode = 500
+                };
             }
         }
 
@@ -81,18 +86,14 @@ namespace SynWord_Server_CSharp.Controllers
             Console.WriteLine("Request: UniqueUpAuth");
             try
             {
-                _userDataHandle = new UserDataHandle(user.uId);
-                _userDataHandle.CheckUserIdExistIfNotCreate();
+                string uId = _googleApi.GetUserId(user.accessToken);
+                _userDataHandle = new UserDataHandle(uId);
+                _getUserData = new GetUserData(uId);
+                _setUserData = new SetUserData(uId);
 
-                _getUserData = new GetUserData(user.uId);
-                _setUserData = new SetUserData(user.uId);
-
-                string clientIp = Request.HttpContext.Connection.RemoteIpAddress.ToString();
-                _usageLog.CheckIpExistsIfNotThenCreate(clientIp);
-
-                if (_getUserData.is24HoursPassed())
+                if (!_userDataHandle.IsUserExist())
                 {
-                    _userDataHandle.ResetDefaults();
+                    throw new UserDoesNotExistException();
                 }
 
                 if (user.text.Length > _getUserData.GetUniqueUpMaxSymbolLimit())
@@ -110,7 +111,6 @@ namespace SynWord_Server_CSharp.Controllers
                 UniqueUpResponseModel uniqueUpResponse = _freeSynonymizer.Synonymize(user.text);
                 string uniqueUpResponseJson = JsonConvert.SerializeObject(uniqueUpResponse);
 
-                _usageLog.IncrementNumberOfUsesIn24Hours(clientIp);
                 _setUserData.SetUniqueUpRequest(--requestsLeft);
 
                 System.Console.WriteLine("Request: UniqueUpAuth [COMPLETED]");
@@ -130,10 +130,18 @@ namespace SynWord_Server_CSharp.Controllers
                 Console.WriteLine("Exception: " + exception.Message);
                 return BadRequest(exception.Message);
             }
+            catch (UserDoesNotExistException ex)
+            {
+                Console.WriteLine("Exception: " + ex.Message);
+                return BadRequest(ex.Message);
+            }
             catch (Exception exception)
             {
                 Console.WriteLine("Exception: " + exception.Message);
-                return new StatusCodeResult(500);
+                return new ObjectResult(exception.Message)
+                {
+                    StatusCode = 500
+                };
             }
         }
     }
