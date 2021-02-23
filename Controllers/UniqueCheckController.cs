@@ -10,6 +10,8 @@ using SynWord_Server_CSharp.Model.UniqueCheck;
 using SynWord_Server_CSharp.Exceptions;
 using Newtonsoft.Json;
 using SynWord_Server_CSharp.GoogleApi;
+using System.Collections.Generic;
+using SynWord_Server_CSharp.Model.Request;
 
 namespace SynWord_Server_CSharp.Controllers {
     [Route("api/[controller]")]
@@ -22,17 +24,23 @@ namespace SynWord_Server_CSharp.Controllers {
         private UserDataHandle _userDataHandle;
         private GoogleOauth2Api _googleApi = new GoogleOauth2Api();
 
-        public UniqueCheckController()
-        {
+        public UniqueCheckController() {
             _uniqueCheckFromApi = new UniqueCheckApi();
             _usageLog = new UniqueCheckUsageLog();
         }
 
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] string text) {
-            Console.WriteLine("Request: UniqueCheck");
+            string clientIp = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+
+            Dictionary<string, dynamic> logInfo = new Dictionary<string, dynamic> {
+                { "Ip", clientIp },
+                { "TextLength", text.Length }
+            };
+
             try {
-                string clientIp = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+                RequestLogger.LogRequestStatus(RequestTypes.UniqueCheck, logInfo, RequestStatuses.Start);
+
                 _usageLog.CheckIpExistsIfNotThenCreate(clientIp);
 
                 if (UserLimits.UniqueCheckMaxSymbolLimit < text.Length) {
@@ -49,91 +57,74 @@ namespace SynWord_Server_CSharp.Controllers {
 
                 _usageLog.IncrementNumberOfUsesIn24Hours(clientIp);
 
-                Console.WriteLine("Request: UniqueCheck [COMPLETED]");
+                RequestLogger.LogRequestStatus(RequestTypes.UniqueCheck, logInfo, RequestStatuses.Completed);
 
                 return new OkObjectResult(uniqueCheckResponseJson);
-            }
-            catch (MaxSymbolLimitReachedException exception)
-            {
-                Console.WriteLine("Exception: " + exception.Message);
-                return BadRequest(exception.Message);
-            }
-            catch (DailyLimitReachedException exception)
-            {
-                Console.WriteLine("Exception: " + exception.Message);
-                return BadRequest(exception.Message);
-            }
-            catch (Exception exception)
-            {
-                Console.WriteLine("Exception: " + exception.Message);
-                return new ObjectResult(exception.Message)
-                {
-                    StatusCode = 500
-                };
+            } catch (Exception exception) {
+                RequestLogger.LogException(RequestTypes.UniqueCheck, logInfo, exception.Message);
+
+                if (new List<Type> { typeof(MaxSymbolLimitReachedException), typeof(DailyLimitReachedException) }.Contains(exception.GetType())) {
+                    return BadRequest(exception.Message);
+                } else {
+                    return new ObjectResult(exception.Message) {
+                        StatusCode = 500
+                    };
+                }
             }
         }
 
         [HttpPost("auth")]
-        public async Task<ActionResult> PostAuth([FromBody] AuthUserModel user)
-        {
-            Console.WriteLine("Request: UniqueCheckAuth");
-            try
-            {
-                string uId = _googleApi.GetUserId(user.accessToken);
+        public async Task<ActionResult> PostAuth([FromBody] AuthUserModel user) {
+            string clientIp = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+
+            Dictionary<string, dynamic> logInfo = new Dictionary<string, dynamic> {
+                { "Ip", clientIp },
+                { "AccessToken", user.AccessToken },
+                { "TextLength", user.Text.Length }
+            };
+
+            try {
+                RequestLogger.LogRequestStatus(RequestTypes.UniqueCheckAuth, logInfo, RequestStatuses.Start);
+
+                string uId = _googleApi.GetUserId(user.AccessToken);
                 _userDataHandle = new UserDataHandle(uId);
                 _getUserData = new GetUserData(uId);
                 _setUserData = new SetUserData(uId);
 
-                if (!_userDataHandle.IsUserExist())
-                {
+                if (!_userDataHandle.IsUserExist()) {
                     throw new UserDoesNotExistException();
                 }
 
-                if (user.text.Length > _getUserData.GetUniqueCheckMaxSymbolLimit())
-                {
+                if (user.Text.Length > _getUserData.GetUniqueCheckMaxSymbolLimit()) {
                     throw new MaxSymbolLimitReachedException();
                 }
 
                 int requestsLeft = _getUserData.GetUniqueCheckRequests();
 
-                if (requestsLeft <= 0)
-                {
+                if (requestsLeft <= 0) {
                     throw new DailyLimitReachedException();
                 }
 
-                UniqueCheckResponseModel uniqueCheckResponse = await _uniqueCheckFromApi.UniqueCheck(user.text);
+                UniqueCheckResponseModel uniqueCheckResponse = await _uniqueCheckFromApi.UniqueCheck(user.Text);
 
                 string uniqueCheckResponseJson = JsonConvert.SerializeObject(uniqueCheckResponse);
 
                 _setUserData.SetUniqueCheckRequest(--requestsLeft);
 
-                Console.WriteLine("Request: UniqueCheckAuth [COMPLETED]");
+                RequestLogger.LogRequestStatus(RequestTypes.UniqueCheckAuth, logInfo, RequestStatuses.Completed);
 
                 return new OkObjectResult(uniqueCheckResponseJson);
 
-            }
-            catch (MaxSymbolLimitReachedException ex)
-            {
-                Console.WriteLine("Exception: " + ex.Message);
-                return BadRequest(ex.Message);
-            }
-            catch (DailyLimitReachedException ex)
-            {
-                Console.WriteLine("Exception: " + ex.Message);
-                return BadRequest(ex.Message);
-            }
-            catch (UserDoesNotExistException ex) 
-            {
-                Console.WriteLine("Exception: " + ex.Message);
-                return BadRequest(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Exception: " + ex.Message);
-                return new ObjectResult(ex.Message)
-                {
-                    StatusCode = 500
-                };
+            } catch (Exception exception) {
+                RequestLogger.LogException(RequestTypes.UniqueCheckAuth, logInfo, exception.Message);
+
+                if (new List<Type> { typeof(MaxSymbolLimitReachedException), typeof(DailyLimitReachedException), typeof(UserDoesNotExistException) }.Contains(exception.GetType())) {
+                    return BadRequest(exception.Message);
+                } else {
+                    return new ObjectResult(exception.Message) {
+                        StatusCode = 500
+                    };
+                }
             }
         }
     }

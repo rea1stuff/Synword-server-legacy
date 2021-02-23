@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Newtonsoft.Json;
 
-namespace SynWord_Server_CSharp.Model.UserPayment
-{
-    public class UserPaymentModel
-    {
-        public String accessToken { get; set; }
-        public String inAppItemId { get; set; }
-        public String purchaseToken { get; set; }
+namespace SynWord_Server_CSharp.Model.UserPayment {
+    public class UserPaymentModel {
+        [JsonProperty("accessToken")]
+        public string AccessToken { get; set; }
+        [JsonProperty("inAppItemId")]
+        public string InAppItemId { get; set; }
+        [JsonProperty("purchaseToken")]
+        public string PurchaseToken { get; set; }
     }
 }

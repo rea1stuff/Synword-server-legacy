@@ -1,0 +1,4 @@
+[23.02.2021 12:35:29] Request: UniqueCheck. Ip: 127.0.0.1. TextLength: 10038. Status: Start.
+[23.02.2021 12:35:30] Request: UniqueCheck. Ip: 127.0.0.1. TextLength: 10038. Status: Completed.
+[23.02.2021 12:53:58] Request: UniqueCheck. Ip: 127.0.0.1. TextLength: 533. Status: Start.
+[23.02.2021 12:54:04] Request: UniqueCheck. Ip: 127.0.0.1. TextLength: 533. Status: Completed.

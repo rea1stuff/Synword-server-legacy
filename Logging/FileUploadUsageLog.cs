@@ -4,32 +4,26 @@ using System.Configuration;
 using MongoDB.Driver;
 using MongoDB.Bson;
 
-namespace SynWord_Server_CSharp.Logging
-{
-    public class FileUploadUsageLog
-    {
+namespace SynWord_Server_CSharp.Logging {
+    public class FileUploadUsageLog {
         readonly private IMongoClient _client;
 
-        public FileUploadUsageLog()
-        {
+        public FileUploadUsageLog() {
             _client = new MongoClient(ConfigurationManager.AppSettings["connectionString"]);
         }
 
-        public void CheckIpExistsIfNotThenCreate(string ip)
-        {
+        public void CheckIpExistsIfNotThenCreate(string ip) {
             IMongoDatabase database = _client.GetDatabase("synword");
             IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("fileUploadUsages");
             BsonDocument filter = new BsonDocument("ip", ip);
             List<BsonDocument> documents = collection.Find(filter).ToList();
 
-            if (documents.Count == 0)
-            {
+            if (documents.Count == 0) {
                 UploadIpToDataBase(ip);
             }
         }
 
-        private void UploadIpToDataBase(string ip)
-        {
+        private void UploadIpToDataBase(string ip) {
             IMongoDatabase database = _client.GetDatabase("synword");
             IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("fileUploadUsages");
 
@@ -42,8 +36,7 @@ namespace SynWord_Server_CSharp.Logging
             collection.InsertOne(document);
         }
 
-        public int GetUsesIn24Hours(string ip)
-        {
+        public int GetUsesIn24Hours(string ip) {
             IMongoDatabase database = _client.GetDatabase("synword");
             IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("fileUploadUsages");
             BsonDocument filter = new BsonDocument("ip", ip);
@@ -52,8 +45,7 @@ namespace SynWord_Server_CSharp.Logging
             return documents.Count != 0 ? documents[0]["usesForTheLastDay"].ToInt32() : 0;
         }
 
-        public void IncrementNumberOfUsesIn24Hours(string ip)
-        {
+        public void IncrementNumberOfUsesIn24Hours(string ip) {
             IMongoDatabase database = _client.GetDatabase("synword");
             IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("fileUploadUsages");
             BsonDocument filter = new BsonDocument("ip", ip);

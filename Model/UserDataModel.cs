@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace SynWord_Server_CSharp.Model
-{
-    public class UserDataModel
-    {
+﻿namespace SynWord_Server_CSharp.Model {
+    public class UserDataModel {
         public string uId { get; set; }
         public bool isPremium { get; set; }
         public int uniqueCheckRequests { get; set; }

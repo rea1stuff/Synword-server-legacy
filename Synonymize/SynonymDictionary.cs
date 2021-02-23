@@ -19,7 +19,7 @@ namespace SynWord_Server_CSharp.Synonymize {
             BsonDocument filter = new BsonDocument();
 
             List<BsonDocument> synonyms = collection.Find(filter).Sort("{ id : 1 }").ToList();
-            
+
             foreach (BsonDocument synonym in synonyms) {
                 dictionary.Add(new Synonym(synonym["id"].ToInt32(), synonym["word"].ToString(), synonym["synonymId"].ToInt32()));
             }

@@ -1,13 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 using SynWord_Server_CSharp.UserData;
 using SynWord_Server_CSharp.GoogleApi;
 using SynWord_Server_CSharp.Exceptions;
+using System.Collections.Generic;
+using SynWord_Server_CSharp.Logging;
+using SynWord_Server_CSharp.Model.Request;
 
 namespace SynWord_Server_CSharp.Controllers {
     [Route("api/[controller]")]
@@ -19,8 +17,15 @@ namespace SynWord_Server_CSharp.Controllers {
 
         [HttpPost]
         public ActionResult GetUserData([FromBody] string accessToken) {
+            string clientIp = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+
+            Dictionary<string, dynamic> logInfo = new Dictionary<string, dynamic> {
+                { "Ip", clientIp },
+                { "AccessToken", accessToken }
+            };
+
             try {
-                Console.WriteLine("Request: Authorization");
+                RequestLogger.LogRequestStatus(RequestTypes.Authorization, logInfo, RequestStatuses.Start);
 
                 string uId = _googleApi.GetUserId(accessToken);
                 _userDataHandle = new UserDataHandle(uId);
@@ -32,17 +37,19 @@ namespace SynWord_Server_CSharp.Controllers {
 
                 string response = _getUserData.GetAllUserData();
 
-                Console.WriteLine("Request: Authorization [COMPLETED]");
+                RequestLogger.LogRequestStatus(RequestTypes.Authorization, logInfo, RequestStatuses.Completed);
 
                 return Ok(response);
-            } catch (InvalidTokenException ex) {
-                Console.WriteLine("Authorization Exception: " + ex.Message);
-                return BadRequest(ex.Message);
-            } catch (Exception ex) {
-                Console.WriteLine("Authorization Exception: " + ex.Message);
-                return new ObjectResult(ex.Message) {
-                    StatusCode = 500
-                };
+            } catch (Exception exception) {
+                RequestLogger.LogException(RequestTypes.Authorization, logInfo, exception.Message);
+
+                if (new List<Type> { typeof(InvalidTokenException) }.Contains(exception.GetType())) {
+                    return BadRequest(exception.Message);
+                } else {
+                    return new ObjectResult(exception.Message) {
+                        StatusCode = 500
+                    };
+                }
             }
         }
     }

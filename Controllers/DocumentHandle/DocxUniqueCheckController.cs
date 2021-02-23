@@ -8,17 +8,16 @@ using SynWord_Server_CSharp.Logging;
 using SynWord_Server_CSharp.UserData;
 using System.Threading.Tasks;
 using SynWord_Server_CSharp.Model.UniqueCheck;
-using SynWord_Server_CSharp.Constants;
 using SynWord_Server_CSharp.Exceptions;
 using Newtonsoft.Json;
 using SynWord_Server_CSharp.GoogleApi;
+using SynWord_Server_CSharp.Model.Request;
+using System.Collections.Generic;
 
-namespace SynWord_Server_CSharp.Controllers
-{
+namespace SynWord_Server_CSharp.Controllers {
     [Route("api/[controller]")]
     [ApiController]
-    public class DocxUniqueCheckController : ControllerBase
-    {
+    public class DocxUniqueCheckController : ControllerBase {
         private IWebHostEnvironment _webHostEnvironment;
         private DocxUniqueCheck _docxUniqueCheck;
         private FileUploadUsageLog _usageLog;
@@ -31,8 +30,7 @@ namespace SynWord_Server_CSharp.Controllers
         static private int counter = 0;
         private int _fileId;
 
-        public DocxUniqueCheckController(IWebHostEnvironment webHostEnvironment)
-        {
+        public DocxUniqueCheckController(IWebHostEnvironment webHostEnvironment) {
             _webHostEnvironment = webHostEnvironment;
             _usageLog = new FileUploadUsageLog();
             _docxLimitsCheck = new DocxGet();
@@ -42,35 +40,37 @@ namespace SynWord_Server_CSharp.Controllers
         }
 
         [HttpPost("auth")]
-        public async Task<IActionResult> Authorized([FromForm] AuthFileUploadModel user)
-        {
-            Console.WriteLine("Request: DocxUniqueCheck");
-            try
-            {
-                string uId = _googleApi.GetUserId(user.accessToken);
+        public async Task<IActionResult> Authorized([FromForm] AuthFileUploadModel user) {
+            string clientIp = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+
+            Dictionary<string, dynamic> logInfo = new Dictionary<string, dynamic> {
+                { "Ip", clientIp },
+                { "AccessToken", user.AccessToken }
+            };
+
+            try {
+                RequestLogger.LogRequestStatus(RequestTypes.DocxUniqueCheck, logInfo, RequestStatuses.Start);
+
+                string uId = _googleApi.GetUserId(user.AccessToken);
                 _userDataHandle = new UserDataHandle(uId);
                 _getUserData = new GetUserData(uId);
                 _setUserData = new SetUserData(uId);
 
-                if (!_userDataHandle.IsUserExist())
-                {
+                if (!_userDataHandle.IsUserExist()) {
                     throw new UserDoesNotExistException();
                 }
 
-                if (!_getUserData.isPremium())
-                {
+                if (!_getUserData.isPremium()) {
                     throw new Exception("You do not have access to it");
                 }
 
-                if (user.Files.Length < 0 || Path.GetExtension(user.Files.FileName) != ".docx")
-                {
+                if (user.Files.Length < 0 || Path.GetExtension(user.Files.FileName) != ".docx") {
                     throw new Exception("Invalid file extension");
                 }
 
                 int requestsLeft = _getUserData.GetUniqueCheckRequests();
 
-                if (requestsLeft <= 0)
-                {
+                if (requestsLeft <= 0) {
                     throw new DailyLimitReachedException();
                 }
 
@@ -79,19 +79,16 @@ namespace SynWord_Server_CSharp.Controllers
 
                 _docxUniqueCheck = new DocxUniqueCheck(filePath);
 
-                if (!Directory.Exists(path))
-                {
+                if (!Directory.Exists(path)) {
                     Directory.CreateDirectory(path);
                 }
 
-                using (FileStream fileStream = System.IO.File.Create(filePath))
-                {
+                using (FileStream fileStream = System.IO.File.Create(filePath)) {
                     user.Files.CopyTo(fileStream);
                     fileStream.Flush();
                 }
 
-                if (_docxLimitsCheck.GetDocSymbolCount(filePath) > _getUserData.GetDocumentMaxSymbolLimit())
-                {
+                if (_docxLimitsCheck.GetDocSymbolCount(filePath) > _getUserData.GetDocumentMaxSymbolLimit()) {
                     throw new MaxSymbolLimitReachedException();
                 }
 
@@ -101,32 +98,19 @@ namespace SynWord_Server_CSharp.Controllers
 
                 _setUserData.SetUniqueCheckRequest(--requestsLeft);
 
-                Console.WriteLine("Request: DocxUniqueCheck [COMPLETED]");
+                RequestLogger.LogRequestStatus(RequestTypes.DocxUniqueCheck, logInfo, RequestStatuses.Completed);
 
                 return Ok(response);
-            }
-            catch (MaxSymbolLimitReachedException exception)
-            {
-                Console.WriteLine("Exception: " + exception.Message);
-                return BadRequest(exception.Message);
-            }
-            catch (DailyLimitReachedException exception)
-            {
-                Console.WriteLine("Exception: " + exception.Message);
-                return BadRequest(exception.Message);
-            }
-            catch (UserDoesNotExistException ex)
-            {
-                Console.WriteLine("Exception: " + ex.Message);
-                return BadRequest(ex.Message);
-            }
-            catch (Exception exception)
-            {
-                Console.WriteLine("Exception: " + exception.Message);
-                return new ObjectResult(exception.Message)
-                {
-                    StatusCode = 500
-                };
+            } catch (Exception exception) {
+                RequestLogger.LogException(RequestTypes.DocxUniqueCheck, logInfo, exception.Message);
+
+                if (new List<Type> { typeof(MaxSymbolLimitReachedException), typeof(DailyLimitReachedException), typeof(UserDoesNotExistException) }.Contains(exception.GetType())) {
+                    return BadRequest(exception.Message);
+                } else {
+                    return new ObjectResult(exception.Message) {
+                        StatusCode = 500
+                    };
+                }
             }
         }
     }

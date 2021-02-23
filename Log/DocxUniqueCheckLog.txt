@@ -1,0 +1,5 @@
+[23.02.2021 12:35:40] Request: DocxUniqueCheck. Ip: 127.0.0.1. Status: Completed.
+[23.02.2021 12:35:49] Request: DocxUniqueCheck. Ip: 127.0.0.1. AccessToken: . Status: Start.
+[23.02.2021 12:35:49] Request: DocxUniqueCheck. Ip: 127.0.0.1. AccessToken: . Exception: invalidToken.
+[23.02.2021 12:36:36] Request: DocxUniqueCheck. Ip: 127.0.0.1. AccessToken: 1. Status: Start.
+[23.02.2021 12:36:37] Request: DocxUniqueCheck. Ip: 127.0.0.1. AccessToken: 1. Exception: invalidToken.

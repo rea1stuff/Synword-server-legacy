@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace SynWord_Server_CSharp.Model
-{
-    public class GoogleUserModel
-    {
+﻿namespace SynWord_Server_CSharp.Model {
+    public class GoogleUserModel {
         public string id { get; set; }
         public string email { get; set; }
         public string verified_email { get; set; }

@@ -1,32 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Configuration;
 using MongoDB.Driver;
 using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
-
 using SynWord_Server_CSharp.Model;
 
-namespace SynWord_Server_CSharp.UserData
-{
-    public class GetUserData
-    {
+namespace SynWord_Server_CSharp.UserData {
+    public class GetUserData {
         readonly private IMongoClient _client = new MongoClient(ConfigurationManager.AppSettings["connectionString"]);
         private string uId;
 
-        public GetUserData(string uId) 
-        {
+        public GetUserData(string uId) {
             this.uId = uId;
         }
 
-        public string GetAllUserData()
-        {
+        public string GetAllUserData() {
             List<BsonDocument> userData = GetData();
 
-            if (userData.Count == 0)
-            {
+            if (userData.Count == 0) {
                 throw new Exception("User data does not exist");
             }
 
@@ -45,69 +37,55 @@ namespace SynWord_Server_CSharp.UserData
             return userDataModel.ToJson();
         }
 
-        public int GetUniqueCheckRequests()
-        {
+        public int GetUniqueCheckRequests() {
             return Get("uniqueCheckRequests");
         }
 
-        public int GetUniqueUpRequests()
-        {
+        public int GetUniqueUpRequests() {
             return Get("uniqueUpRequests");
         }
 
-        public int GetDocumentUniqueUpRequests()
-        {
+        public int GetDocumentUniqueUpRequests() {
             return Get("documentUniqueUpRequests");
         }
-        public int GetDocumentMaxSymbolLimit()
-        {
+        public int GetDocumentMaxSymbolLimit() {
             return Get("documentMaxSymbolLimit");
         }
-        public int GetUniqueCheckMaxSymbolLimit()
-        {
+        public int GetUniqueCheckMaxSymbolLimit() {
             return Get("uniqueCheckMaxSymbolLimit");
         }
 
-        public int GetUniqueUpMaxSymbolLimit()
-        {
+        public int GetUniqueUpMaxSymbolLimit() {
             return Get("uniqueUpMaxSymbolLimit");
         }
 
-        public string GetCreationDate()
-        {
+        public string GetCreationDate() {
             List<BsonDocument> userData = GetData();
 
             return userData[0]["creationDate"].ToString();
         }
 
-        public bool isPremium()
-        {
+        public bool isPremium() {
             List<BsonDocument> userData = GetData();
 
-            if (userData[0]["isPremium"].AsBoolean)
-            {
+            if (userData[0]["isPremium"].AsBoolean) {
                 return true;
-            }
-            else
-            {
+            } else {
                 return false;
             }
         }
 
-        private int Get(string valueName)
-        {
+        private int Get(string valueName) {
             List<BsonDocument> userData = GetData();
 
-            if (userData.Count == 0)
-            {
+            if (userData.Count == 0) {
                 throw new Exception("User data does not exist");
             }
 
             return userData[0][valueName].ToInt32();
         }
 
-        private List<BsonDocument> GetData()
-        {
+        private List<BsonDocument> GetData() {
             IMongoDatabase database = _client.GetDatabase("synword");
             IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("userData");
             var filter = new BsonDocument("uId", uId);

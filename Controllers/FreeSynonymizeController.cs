@@ -9,13 +9,13 @@ using SynWord_Server_CSharp.UserData;
 using SynWord_Server_CSharp.Constants;
 using SynWord_Server_CSharp.Exceptions;
 using SynWord_Server_CSharp.GoogleApi;
+using System.Collections.Generic;
+using SynWord_Server_CSharp.Model.Request;
 
-namespace SynWord_Server_CSharp.Controllers
-{
+namespace SynWord_Server_CSharp.Controllers {
     [Route("api/[controller]")]
     [ApiController]
-    public class FreeSynonymizeController : ControllerBase
-    {
+    public class FreeSynonymizeController : ControllerBase {
         private ISynonymizer _freeSynonymizer;
         private FreeSynonimizerUsageLog _usageLog;
         private GetUserData _getUserData;
@@ -23,28 +23,30 @@ namespace SynWord_Server_CSharp.Controllers
         private UserDataHandle _userDataHandle;
         private GoogleOauth2Api _googleApi = new GoogleOauth2Api();
 
-        public FreeSynonymizeController()
-        {
+        public FreeSynonymizeController() {
             _freeSynonymizer = new FreeSynonymizer();
             _usageLog = new FreeSynonimizerUsageLog();
         }
 
         [HttpPost]
-        public IActionResult Post([FromBody] string text)
-        {
-            Console.WriteLine("Request: UniqueUp");
-            try
-            {
-                string clientIp = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+        public IActionResult Post([FromBody] string text) {
+            string clientIp = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+
+            Dictionary<string, dynamic> logInfo = new Dictionary<string, dynamic> {
+                { "Ip", clientIp },
+                { "TextLength", text.Length }
+            };
+
+            try {
+                RequestLogger.LogRequestStatus(RequestTypes.UniqueUp, logInfo, RequestStatuses.Start);
+
                 _usageLog.CheckIpExistsIfNotThenCreate(clientIp);
 
-                if (text.Length > UserLimits.UniqueUpMaxSymbolLimit)
-                {
+                if (text.Length > UserLimits.UniqueUpMaxSymbolLimit) {
                     throw new MaxSymbolLimitReachedException();
                 }
 
-                if (_usageLog.GetUsesIn24Hours(clientIp) > UserLimits.UniqueCheckRequests)
-                {
+                if (_usageLog.GetUsesIn24Hours(clientIp) > UserLimits.UniqueCheckRequests) {
                     throw new DailyLimitReachedException();
                 }
 
@@ -53,95 +55,76 @@ namespace SynWord_Server_CSharp.Controllers
 
                 _usageLog.IncrementNumberOfUsesIn24Hours(clientIp);
 
-                Console.WriteLine("Request: UniqueUp [COMPLETED]");
+                RequestLogger.LogRequestStatus(RequestTypes.UniqueUp, logInfo, RequestStatuses.Completed);
 
-                return new ObjectResult(uniqueUpResponseJson)
-                {
+                return new ObjectResult(uniqueUpResponseJson) {
                     StatusCode = 200
                 };
-            }
-            catch (MaxSymbolLimitReachedException exception)
-            {
-                Console.WriteLine("Exception: " + exception.Message);
-                return BadRequest(exception.Message);
-            }
-            catch (DailyLimitReachedException exception)
-            {
-                Console.WriteLine("Exception: " + exception.Message);
-                return BadRequest(exception.Message);
-            }
-            catch (Exception exception)
-            {
-                Console.WriteLine("Exception: " + exception.Message);
-                return new ObjectResult(exception.Message)
-                {
-                    StatusCode = 500
-                };
+            } catch (Exception exception) {
+                RequestLogger.LogException(RequestTypes.UniqueUp, logInfo, exception.Message);
+
+                if (new List<Type> { typeof(MaxSymbolLimitReachedException), typeof(DailyLimitReachedException) }.Contains(exception.GetType())) {
+                    return BadRequest(exception.Message);
+                } else {
+                    return new ObjectResult(exception.Message) {
+                        StatusCode = 500
+                    };
+                }
             }
         }
 
         [HttpPost("auth")]
-        public IActionResult PostAuth([FromBody] AuthUserModel user)
-        {
-            Console.WriteLine("Request: UniqueUpAuth");
-            try
-            {
-                string uId = _googleApi.GetUserId(user.accessToken);
+        public IActionResult PostAuth([FromBody] AuthUserModel user) {
+            string clientIp = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+
+            Dictionary<string, dynamic> logInfo = new Dictionary<string, dynamic> {
+                { "Ip", clientIp },
+                { "AccessToken", user.AccessToken },
+                { "TextLength", user.Text.Length }
+            };
+
+            try {
+                RequestLogger.LogRequestStatus(RequestTypes.UniqueUpAuth, logInfo, RequestStatuses.Start);
+
+                string uId = _googleApi.GetUserId(user.AccessToken);
                 _userDataHandle = new UserDataHandle(uId);
                 _getUserData = new GetUserData(uId);
                 _setUserData = new SetUserData(uId);
 
-                if (!_userDataHandle.IsUserExist())
-                {
+                if (!_userDataHandle.IsUserExist()) {
                     throw new UserDoesNotExistException();
                 }
 
-                if (user.text.Length > _getUserData.GetUniqueUpMaxSymbolLimit())
-                {
+                if (user.Text.Length > _getUserData.GetUniqueUpMaxSymbolLimit()) {
                     throw new MaxSymbolLimitReachedException();
                 }
 
                 int requestsLeft = _getUserData.GetUniqueUpRequests();
 
-                if (requestsLeft <= 0)
-                {
+                if (requestsLeft <= 0) {
                     throw new DailyLimitReachedException();
                 }
 
-                UniqueUpResponseModel uniqueUpResponse = _freeSynonymizer.Synonymize(user.text);
+                UniqueUpResponseModel uniqueUpResponse = _freeSynonymizer.Synonymize(user.Text);
                 string uniqueUpResponseJson = JsonConvert.SerializeObject(uniqueUpResponse);
 
                 _setUserData.SetUniqueUpRequest(--requestsLeft);
 
-                System.Console.WriteLine("Request: UniqueUpAuth [COMPLETED]");
+                RequestLogger.LogRequestStatus(RequestTypes.UniqueUpAuth, logInfo, RequestStatuses.Completed);
 
-                return new ObjectResult(uniqueUpResponseJson)
-                {
+                return new ObjectResult(uniqueUpResponseJson) {
                     StatusCode = 200
                 };
-            }
-            catch (MaxSymbolLimitReachedException exception)
-            {
-                Console.WriteLine("Exception: " + exception.Message);
-                return BadRequest(exception.Message);
-            }
-            catch (DailyLimitReachedException exception)
-            {
-                Console.WriteLine("Exception: " + exception.Message);
-                return BadRequest(exception.Message);
-            }
-            catch (UserDoesNotExistException ex)
-            {
-                Console.WriteLine("Exception: " + ex.Message);
-                return BadRequest(ex.Message);
-            }
-            catch (Exception exception)
-            {
-                Console.WriteLine("Exception: " + exception.Message);
-                return new ObjectResult(exception.Message)
-                {
-                    StatusCode = 500
-                };
+            } catch (Exception exception) {
+                RequestLogger.LogException(RequestTypes.UniqueUpAuth, logInfo, exception.Message);
+
+                if (new List<Type> { typeof(MaxSymbolLimitReachedException), typeof(DailyLimitReachedException), typeof(UserDoesNotExistException) }.Contains(exception.GetType())) {
+                    return BadRequest(exception.Message);
+                } else {
+                    return new ObjectResult(exception.Message) {
+                        StatusCode = 500
+                    };
+                }
             }
         }
     }
