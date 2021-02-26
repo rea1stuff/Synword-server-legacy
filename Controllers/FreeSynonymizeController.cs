@@ -38,7 +38,7 @@ namespace SynWord_Server_CSharp.Controllers {
             };
 
             try {
-                RequestLogger.LogRequestStatus(RequestTypes.UniqueUp, logInfo, RequestStatuses.Start);
+                RequestLogger.Add(new RequestStatusLog(RequestTypes.UniqueUp, logInfo, RequestStatuses.Start));
 
                 _usageLog.CheckIpExistsIfNotThenCreate(clientIp);
 
@@ -55,13 +55,13 @@ namespace SynWord_Server_CSharp.Controllers {
 
                 _usageLog.IncrementNumberOfUsesIn24Hours(clientIp);
 
-                RequestLogger.LogRequestStatus(RequestTypes.UniqueUp, logInfo, RequestStatuses.Completed);
+                RequestLogger.Add(new RequestStatusLog(RequestTypes.UniqueUp, logInfo, RequestStatuses.Completed));
 
                 return new ObjectResult(uniqueUpResponseJson) {
                     StatusCode = 200
                 };
             } catch (Exception exception) {
-                RequestLogger.LogException(RequestTypes.UniqueUp, logInfo, exception.Message);
+                RequestLogger.Add(new RequestExceptionLog(RequestTypes.UniqueUp, logInfo, exception.Message));
 
                 if (new List<Type> { typeof(MaxSymbolLimitReachedException), typeof(DailyLimitReachedException) }.Contains(exception.GetType())) {
                     return BadRequest(exception.Message);
@@ -84,7 +84,7 @@ namespace SynWord_Server_CSharp.Controllers {
             };
 
             try {
-                RequestLogger.LogRequestStatus(RequestTypes.UniqueUpAuth, logInfo, RequestStatuses.Start);
+                RequestLogger.Add(new RequestStatusLog(RequestTypes.UniqueUpAuth, logInfo, RequestStatuses.Start));
 
                 string uId = _googleApi.GetUserId(user.AccessToken);
                 _userDataHandle = new UserDataHandle(uId);
@@ -110,13 +110,13 @@ namespace SynWord_Server_CSharp.Controllers {
 
                 _setUserData.SetUniqueUpRequest(--requestsLeft);
 
-                RequestLogger.LogRequestStatus(RequestTypes.UniqueUpAuth, logInfo, RequestStatuses.Completed);
+                RequestLogger.Add(new RequestStatusLog(RequestTypes.UniqueUpAuth, logInfo, RequestStatuses.Completed));
 
                 return new ObjectResult(uniqueUpResponseJson) {
                     StatusCode = 200
                 };
             } catch (Exception exception) {
-                RequestLogger.LogException(RequestTypes.UniqueUpAuth, logInfo, exception.Message);
+                RequestLogger.Add(new RequestExceptionLog(RequestTypes.UniqueUpAuth, logInfo, exception.Message));
 
                 if (new List<Type> { typeof(MaxSymbolLimitReachedException), typeof(DailyLimitReachedException), typeof(UserDoesNotExistException) }.Contains(exception.GetType())) {
                     return BadRequest(exception.Message);

@@ -28,7 +28,7 @@ namespace SynWord_Server_CSharp.Controllers.UserDataHandleControllers {
             };
 
             try {
-                RequestLogger.LogRequestStatus(RequestTypes.SetPremium, logInfo, RequestStatuses.Start);
+                RequestLogger.Add(new RequestStatusLog(RequestTypes.SetPremium, logInfo, RequestStatuses.Start));
 
                 string uId = _googleApi.GetUserId(payment.AccessToken);
                 _userDataHandle = new UserDataHandle(uId);
@@ -43,11 +43,11 @@ namespace SynWord_Server_CSharp.Controllers.UserDataHandleControllers {
 
                 _setUserData.SetPremium();
 
-                RequestLogger.LogRequestStatus(RequestTypes.SetPremium, logInfo, RequestStatuses.Start);
+                RequestLogger.Add(new RequestStatusLog(RequestTypes.SetPremium, logInfo, RequestStatuses.Completed));
 
                 return Ok("success");
             } catch (Exception exception) {
-                RequestLogger.LogException(RequestTypes.SetPremium, logInfo, exception.Message);
+                RequestLogger.Add(new RequestExceptionLog(RequestTypes.SetPremium, logInfo, exception.Message));
 
                 return new ObjectResult(exception.Message) {
                     StatusCode = 500

@@ -49,7 +49,7 @@ namespace SynWord_Server_CSharp.Controllers {
             };
 
             try {
-                RequestLogger.LogRequestStatus(RequestTypes.DocxUniqueCheck, logInfo, RequestStatuses.Start);
+                RequestLogger.Add(new RequestStatusLog(RequestTypes.DocxUniqueCheck, logInfo, RequestStatuses.Start));
 
                 string uId = _googleApi.GetUserId(user.AccessToken);
                 _userDataHandle = new UserDataHandle(uId);
@@ -98,11 +98,11 @@ namespace SynWord_Server_CSharp.Controllers {
 
                 _setUserData.SetUniqueCheckRequest(--requestsLeft);
 
-                RequestLogger.LogRequestStatus(RequestTypes.DocxUniqueCheck, logInfo, RequestStatuses.Completed);
+                RequestLogger.Add(new RequestStatusLog(RequestTypes.DocxUniqueCheck, logInfo, RequestStatuses.Completed));
 
                 return Ok(response);
             } catch (Exception exception) {
-                RequestLogger.LogException(RequestTypes.DocxUniqueCheck, logInfo, exception.Message);
+                RequestLogger.Add(new RequestExceptionLog(RequestTypes.DocxUniqueCheck, logInfo, exception.Message));
 
                 if (new List<Type> { typeof(MaxSymbolLimitReachedException), typeof(DailyLimitReachedException), typeof(UserDoesNotExistException) }.Contains(exception.GetType())) {
                     return BadRequest(exception.Message);

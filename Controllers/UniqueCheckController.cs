@@ -39,7 +39,7 @@ namespace SynWord_Server_CSharp.Controllers {
             };
 
             try {
-                RequestLogger.LogRequestStatus(RequestTypes.UniqueCheck, logInfo, RequestStatuses.Start);
+                RequestLogger.Add(new RequestStatusLog(RequestTypes.UniqueCheck, logInfo, RequestStatuses.Start));
 
                 _usageLog.CheckIpExistsIfNotThenCreate(clientIp);
 
@@ -57,11 +57,11 @@ namespace SynWord_Server_CSharp.Controllers {
 
                 _usageLog.IncrementNumberOfUsesIn24Hours(clientIp);
 
-                RequestLogger.LogRequestStatus(RequestTypes.UniqueCheck, logInfo, RequestStatuses.Completed);
+                RequestLogger.Add(new RequestStatusLog(RequestTypes.UniqueCheck, logInfo, RequestStatuses.Completed));
 
                 return new OkObjectResult(uniqueCheckResponseJson);
             } catch (Exception exception) {
-                RequestLogger.LogException(RequestTypes.UniqueCheck, logInfo, exception.Message);
+                RequestLogger.Add(new RequestExceptionLog(RequestTypes.UniqueCheck, logInfo, exception.Message));
 
                 if (new List<Type> { typeof(MaxSymbolLimitReachedException), typeof(DailyLimitReachedException) }.Contains(exception.GetType())) {
                     return BadRequest(exception.Message);
@@ -84,7 +84,7 @@ namespace SynWord_Server_CSharp.Controllers {
             };
 
             try {
-                RequestLogger.LogRequestStatus(RequestTypes.UniqueCheckAuth, logInfo, RequestStatuses.Start);
+                RequestLogger.Add(new RequestStatusLog(RequestTypes.UniqueCheckAuth, logInfo, RequestStatuses.Start));
 
                 string uId = _googleApi.GetUserId(user.AccessToken);
                 _userDataHandle = new UserDataHandle(uId);
@@ -111,12 +111,12 @@ namespace SynWord_Server_CSharp.Controllers {
 
                 _setUserData.SetUniqueCheckRequest(--requestsLeft);
 
-                RequestLogger.LogRequestStatus(RequestTypes.UniqueCheckAuth, logInfo, RequestStatuses.Completed);
+                RequestLogger.Add(new RequestStatusLog(RequestTypes.UniqueCheckAuth, logInfo, RequestStatuses.Completed));
 
                 return new OkObjectResult(uniqueCheckResponseJson);
 
             } catch (Exception exception) {
-                RequestLogger.LogException(RequestTypes.UniqueCheckAuth, logInfo, exception.Message);
+                RequestLogger.Add(new RequestExceptionLog(RequestTypes.UniqueCheckAuth, logInfo, exception.Message));
 
                 if (new List<Type> { typeof(MaxSymbolLimitReachedException), typeof(DailyLimitReachedException), typeof(UserDoesNotExistException) }.Contains(exception.GetType())) {
                     return BadRequest(exception.Message);

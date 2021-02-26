@@ -27,7 +27,7 @@ namespace SynWord_Server_CSharp.Controllers.UserDataHandleControllers.SetRequest
             };
 
             try {
-                RequestLogger.LogRequestStatus(RequestTypes.SetDocUU, logInfo, RequestStatuses.Start);
+                RequestLogger.Add(new RequestStatusLog(RequestTypes.SetDocUU, logInfo, RequestStatuses.Start));
 
                 string uId = _googleApi.GetUserId(payment.AccessToken);
                 _userDataHandle = new UserDataHandle(uId);
@@ -39,11 +39,11 @@ namespace SynWord_Server_CSharp.Controllers.UserDataHandleControllers.SetRequest
                 int count = 10;
                 _setUserData.SetDocumentUniqueUpRequests(count);
 
-                RequestLogger.LogRequestStatus(RequestTypes.SetDocUU, logInfo, RequestStatuses.Completed);
+                RequestLogger.Add(new RequestStatusLog(RequestTypes.SetDocUU, logInfo, RequestStatuses.Completed));
 
                 return Ok("success");
             } catch (Exception exception) {
-                RequestLogger.LogException(RequestTypes.SetDocUU, logInfo, exception.Message);
+                RequestLogger.Add(new RequestExceptionLog(RequestTypes.SetDocUU, logInfo, exception.Message));
 
                 return BadRequest(exception.Message);
             }

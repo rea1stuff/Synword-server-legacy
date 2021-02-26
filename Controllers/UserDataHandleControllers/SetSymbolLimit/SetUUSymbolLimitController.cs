@@ -28,7 +28,7 @@ namespace SynWord_Server_CSharp.Controllers.UserDataHandleControllers.SetSymbolL
             };
 
             try {
-                RequestLogger.LogRequestStatus(RequestTypes.SetUUSymbolLimit, logInfo, RequestStatuses.Start);
+                RequestLogger.Add(new RequestStatusLog(RequestTypes.SetUUSymbolLimit, logInfo, RequestStatuses.Start));
 
                 string uId = _googleApi.GetUserId(payment.AccessToken);
                 _setUserData = new SetUserData(uId);
@@ -44,11 +44,11 @@ namespace SynWord_Server_CSharp.Controllers.UserDataHandleControllers.SetSymbolL
                 int count = 20000;
                 _setUserData.SetUniqueUpMaxSymbolLimit(count);
 
-                RequestLogger.LogRequestStatus(RequestTypes.SetUUSymbolLimit, logInfo, RequestStatuses.Completed);
+                RequestLogger.Add(new RequestStatusLog(RequestTypes.SetUUSymbolLimit, logInfo, RequestStatuses.Completed));
 
                 return Ok("success");
             } catch (Exception exception) {
-                RequestLogger.LogException(RequestTypes.SetUUSymbolLimit, logInfo, exception.Message);
+                RequestLogger.Add(new RequestExceptionLog(RequestTypes.SetUUSymbolLimit, logInfo, exception.Message));
 
                 return BadRequest(exception.Message);
             }

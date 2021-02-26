@@ -16,6 +16,7 @@ namespace SynWord_Server_CSharp {
                     webBuilder.UseStartup<Startup>();
                     SynonymDictionary.InitializeDictionary();
                     Task.Run(() => new MidnightReset().UseReset());
+                    Task.Run(() => RequestLogger.Logging());
                 });
     }
 }

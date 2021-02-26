@@ -17,12 +17,12 @@ namespace SynWord_Server_CSharp.Controllers {
                 { "Ip", clientIp }
             };
 
-            RequestLogger.LogRequestStatus(RequestTypes.Session, logInfo, RequestStatuses.Start);
+            RequestLogger.Add(new RequestStatusLog(RequestTypes.Session, logInfo, RequestStatuses.Start));
 
             _visitation.CheckIpExistsIfNotThenCreate(clientIp);
             _visitation.IncrementNumberOfVisitsIn24Hours(clientIp);
 
-            RequestLogger.LogRequestStatus(RequestTypes.Session, logInfo, RequestStatuses.Completed);
+            RequestLogger.Add(new RequestStatusLog(RequestTypes.Session, logInfo, RequestStatuses.Completed));
         }
     }
 }
