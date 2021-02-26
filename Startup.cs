@@ -24,6 +24,7 @@ namespace SynWord_Server_CSharp {
             }
 
             WebRootPath.Initialize(env);
+            ContentRootPath.Initialize(env);
 
             //app.UseHttpsRedirection();
 

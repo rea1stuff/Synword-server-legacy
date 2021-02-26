@@ -72,7 +72,7 @@ namespace SynWord_Server_CSharp.Controllers {
                     throw new DailyLimitReachedException();
                 }
 
-                string path = WebRootPath.Path + @"\Uploaded_Files\";
+                string path = ContentRootPath.Path + @"\UploadedFiles\";
                 string filePath = path + _fileId + "_" + "UniqueCheck" + "_" + user.Files.FileName;
 
                 _docxUniqueCheck = new DocxUniqueCheck(filePath);
