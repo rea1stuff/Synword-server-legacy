@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 namespace SynWord_Server_CSharp.Logging {
     static class RequestLogger {
         private static readonly BlockingCollection<RequestLog> queue;
-        private static string webRootPath;
 
         static RequestLogger() {
             queue = new BlockingCollection<RequestLog>();
