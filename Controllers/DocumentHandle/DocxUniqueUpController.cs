@@ -129,7 +129,7 @@ namespace SynWord_Server_CSharp.Controllers {
                     throw new DailyLimitReachedException();
                 }
 
-                string path = _webHostEnvironment.WebRootPath + @"\Uploaded_Files\";
+                string path = WebRootPath.Path + @"\Uploaded_Files\";
                 string filePath = path + _fileId + "_" + "UniqueUp" + "_" + user.Files.FileName;
 
                 if (!Directory.Exists(path)) {
