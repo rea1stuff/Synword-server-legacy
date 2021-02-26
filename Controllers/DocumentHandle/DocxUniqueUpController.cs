@@ -16,7 +16,6 @@ namespace SynWord_Server_CSharp.Controllers {
     [Route("api/[controller]")]
     [ApiController]
     public class DocxUniqueUpController : ControllerBase {
-        private IWebHostEnvironment _webHostEnvironment;
         private DocxUniqueUp _docxUniqueUp;
         private DocxGet _docxLimitsCheck;
         private FileUploadUsageLog _usageLog;
@@ -28,8 +27,7 @@ namespace SynWord_Server_CSharp.Controllers {
         static private int counter = 0;
         private int _fileId;
 
-        public DocxUniqueUpController(IWebHostEnvironment webHostEnvironment) {
-            _webHostEnvironment = webHostEnvironment;
+        public DocxUniqueUpController() {
             _docxUniqueUp = new DocxUniqueUp();
             _usageLog = new FileUploadUsageLog();
             _docxLimitsCheck = new DocxGet();
@@ -51,7 +49,7 @@ namespace SynWord_Server_CSharp.Controllers {
 
                 _usageLog.CheckIpExistsIfNotThenCreate(clientIp);
 
-                string path = _webHostEnvironment.WebRootPath + @"\Uploaded_Files\";
+                string path = WebRootPath.Path + @"\Uploaded_Files\";
                 string filePath = path + _fileId + "_" + "UniqueUp" + "_" + user.Files.FileName;
 
                 if (!Directory.Exists(path)) {

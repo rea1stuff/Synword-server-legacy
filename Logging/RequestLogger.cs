@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 namespace SynWord_Server_CSharp.Logging {
     static class RequestLogger {
         private static readonly BlockingCollection<RequestLog> queue;
+        private static string webRootPath;
 
         static RequestLogger() {
             queue = new BlockingCollection<RequestLog>();
@@ -44,7 +45,7 @@ namespace SynWord_Server_CSharp.Logging {
         private static void LogRequestStatus(RequestType type, Dictionary<string, dynamic> otherInfo, RequestStatus status) {
             string otherInfoString = "";
 
-            string path = "../SynWord-Server-CSharp/Log/" + type.Name + "Log.txt";
+            string path = WebRootPath.Path + @"\Log\" + type.Name + "Log.txt";
 
             foreach (KeyValuePair<string, dynamic> pair in otherInfo) {
                 otherInfoString += pair.Key + ": " + pair.Value + ".\n";
@@ -59,7 +60,7 @@ namespace SynWord_Server_CSharp.Logging {
         private static void LogException(RequestType type, Dictionary<string, dynamic> otherInfo, string exceptionMessage) {
             string otherInfoString = "";
 
-            string path = "../SynWord-Server-CSharp/Log/ExceptionLog.txt";
+            string path = WebRootPath.Path + @"\Log\ExceptionLog.txt";
 
             foreach (KeyValuePair<string, dynamic> pair in otherInfo) {
                 otherInfoString += pair.Key + ": " + pair.Value + ".\n";

@@ -18,7 +18,6 @@ namespace SynWord_Server_CSharp.Controllers {
     [Route("api/[controller]")]
     [ApiController]
     public class DocxUniqueCheckController : ControllerBase {
-        private IWebHostEnvironment _webHostEnvironment;
         private DocxUniqueCheck _docxUniqueCheck;
         private FileUploadUsageLog _usageLog;
         private GetUserData _getUserData;
@@ -30,8 +29,7 @@ namespace SynWord_Server_CSharp.Controllers {
         static private int counter = 0;
         private int _fileId;
 
-        public DocxUniqueCheckController(IWebHostEnvironment webHostEnvironment) {
-            _webHostEnvironment = webHostEnvironment;
+        public DocxUniqueCheckController() {
             _usageLog = new FileUploadUsageLog();
             _docxLimitsCheck = new DocxGet();
 
@@ -74,7 +72,7 @@ namespace SynWord_Server_CSharp.Controllers {
                     throw new DailyLimitReachedException();
                 }
 
-                string path = _webHostEnvironment.WebRootPath + @"\Uploaded_Files\";
+                string path = WebRootPath.Path + @"\Uploaded_Files\";
                 string filePath = path + _fileId + "_" + "UniqueCheck" + "_" + user.Files.FileName;
 
                 _docxUniqueCheck = new DocxUniqueCheck(filePath);
