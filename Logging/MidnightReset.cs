@@ -26,6 +26,7 @@ namespace SynWord_Server_CSharp.Logging {
                 Thread.Sleep((int)milliseconds);
                 Reset();
                 ChangeLastLogResetDate();
+                configuration = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
                 lastLogResetDate = DateTime.Parse(string.Format(configuration.AppSettings.Settings["lastLogResetDate"].Value));
             }
         }
