@@ -49,8 +49,8 @@ namespace SynWord_Server_CSharp.Controllers {
 
                 _usageLog.CheckIpExistsIfNotThenCreate(clientIp);
 
-                string path = ContentRootPath.Path + @"\UploadedFiles\";
-                string filePath = path + _fileId + "_" + "UniqueUp" + "_" + user.Files.FileName;
+                string path = ContentRootPath.Path + @"/Files/UploadedFiles/";
+                string filePath = path + _fileId + "_" + "UniqueUp";
 
                 if (!Directory.Exists(path)) {
                     Directory.CreateDirectory(path);
@@ -118,8 +118,9 @@ namespace SynWord_Server_CSharp.Controllers {
                 if (!_userDataHandle.IsUserExist()) {
                     throw new UserDoesNotExistException();
                 }
-
-                if (user.Files.Length < 0 || Path.GetExtension(user.Files.FileName) != ".docx") {
+                
+                if (user.Files.Length <= 0 || Path.GetExtension(user.Files.FileName) != ".docx")
+                {
                     throw new Exception("Invalid file extension");
                 }
 
@@ -129,8 +130,8 @@ namespace SynWord_Server_CSharp.Controllers {
                     throw new DailyLimitReachedException();
                 }
 
-                string path = ContentRootPath.Path + @"\UploadedFiles\";
-                string filePath = path + _fileId + "_" + "UniqueUp" + "_" + user.Files.FileName;
+                string path = ContentRootPath.Path + @"/Files/UploadedFiles/";
+                string filePath = path + _fileId + "_" + "UniqueUp_Auth";
 
                 if (!Directory.Exists(path)) {
                     Directory.CreateDirectory(path);

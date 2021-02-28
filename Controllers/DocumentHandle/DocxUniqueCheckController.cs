@@ -62,7 +62,8 @@ namespace SynWord_Server_CSharp.Controllers {
                     throw new Exception("You do not have access to it");
                 }
 
-                if (user.Files.Length < 0 || Path.GetExtension(user.Files.FileName) != ".docx") {
+                if (user.Files.Length <= 0 || Path.GetExtension(user.Files.FileName) != ".docx")
+                {
                     throw new Exception("Invalid file extension");
                 }
 
@@ -72,7 +73,7 @@ namespace SynWord_Server_CSharp.Controllers {
                     throw new DailyLimitReachedException();
                 }
 
-                string path = ContentRootPath.Path + @"\UploadedFiles\";
+                string path = ContentRootPath.Path + @"/Files/UploadedFiles/";
                 string filePath = path + _fileId + "_" + "UniqueCheck" + "_" + user.Files.FileName;
 
                 _docxUniqueCheck = new DocxUniqueCheck(filePath);

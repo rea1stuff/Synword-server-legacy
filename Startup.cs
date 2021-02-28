@@ -23,7 +23,6 @@ namespace SynWord_Server_CSharp {
                 app.UseDeveloperExceptionPage();
             }
 
-            WebRootPath.Initialize(env);
             ContentRootPath.Initialize(env);
 
             //app.UseHttpsRedirection();

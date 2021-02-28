@@ -43,7 +43,7 @@ namespace SynWord_Server_CSharp.Controllers {
             } catch (Exception exception) {
                 RequestLogger.Add(new RequestExceptionLog(RequestTypes.Authorization, logInfo, exception.Message));
 
-                if (new List<Type> { typeof(InvalidTokenException) }.Contains(exception.GetType())) {
+                if (new List<Type> { typeof(InvalidAccessTokenException) }.Contains(exception.GetType())) {
                     return BadRequest(exception.Message);
                 } else {
                     return new ObjectResult(exception.Message) {

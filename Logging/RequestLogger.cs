@@ -44,7 +44,7 @@ namespace SynWord_Server_CSharp.Logging {
         private static void LogRequestStatus(RequestType type, Dictionary<string, dynamic> otherInfo, RequestStatus status) {
             string otherInfoString = "";
 
-            string path = ContentRootPath.Path + @"\Log\" + type.Name + "Log.txt";
+            string path = ContentRootPath.Path + @"/Files/Log/" + type.Name + "Log.txt";
 
             foreach (KeyValuePair<string, dynamic> pair in otherInfo) {
                 otherInfoString += pair.Key + ": " + pair.Value + ".\n";
@@ -59,7 +59,7 @@ namespace SynWord_Server_CSharp.Logging {
         private static void LogException(RequestType type, Dictionary<string, dynamic> otherInfo, string exceptionMessage) {
             string otherInfoString = "";
 
-            string path = ContentRootPath.Path + @"\Log\ExceptionLog.txt";
+            string path = ContentRootPath.Path + @"/Files/Log/ExceptionLog.txt";
 
             foreach (KeyValuePair<string, dynamic> pair in otherInfo) {
                 otherInfoString += pair.Key + ": " + pair.Value + ".\n";

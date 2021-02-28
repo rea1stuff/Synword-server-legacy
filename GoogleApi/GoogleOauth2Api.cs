@@ -68,7 +68,7 @@ namespace SynWord_Server_CSharp.GoogleApi
 
             if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
             {
-                throw new InvalidTokenException();
+                throw new InvalidAccessTokenException();
             }
             var response = httpResponseMessage.Content.ReadAsStringAsync().Result;
 
