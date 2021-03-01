@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 using System.Configuration;
-using SynWord_Server_CSharp.UserDataHandle;
+using SynWord_Server_CSharp.UserData;
 
 namespace SynWord_Server_CSharp.Logging {
     public class MidnightReset {
