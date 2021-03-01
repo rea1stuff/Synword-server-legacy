@@ -31,12 +31,12 @@ namespace SynWord_Server_CSharp.Logging {
 
         public static void Logging() {
             while (true) {
-                if (queue.TryTake(out RequestLog currentLog)) {
-                    if (currentLog is RequestStatusLog statusLog) {
-                        LogRequestStatus(statusLog.Type, statusLog.OtherInfo, statusLog.RequestStatus);
-                    } else if (currentLog is RequestExceptionLog exceptionLog) {
-                        LogException(exceptionLog.Type, exceptionLog.OtherInfo, exceptionLog.ExceptionMessage);
-                    }
+                RequestLog currentLog = queue.Take();
+
+                if (currentLog is RequestStatusLog statusLog) {
+                    LogRequestStatus(statusLog.Type, statusLog.OtherInfo, statusLog.RequestStatus);
+                } else if (currentLog is RequestExceptionLog exceptionLog) {
+                    LogException(exceptionLog.Type, exceptionLog.OtherInfo, exceptionLog.ExceptionMessage);
                 }
             }
         }

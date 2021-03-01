@@ -31,7 +31,7 @@ namespace SynWord_Server_CSharp.Controllers {
 
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] string text) {
-            string clientIp = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+            string clientIp = Request.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
 
             Dictionary<string, dynamic> logInfo = new Dictionary<string, dynamic> {
                 { "Ip", clientIp },
@@ -75,7 +75,7 @@ namespace SynWord_Server_CSharp.Controllers {
 
         [HttpPost("auth")]
         public async Task<ActionResult> PostAuth([FromBody] AuthUserModel user) {
-            string clientIp = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+            string clientIp = Request.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
 
             Dictionary<string, dynamic> logInfo = new Dictionary<string, dynamic> {
                 { "Ip", clientIp },

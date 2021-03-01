@@ -38,7 +38,7 @@ namespace SynWord_Server_CSharp.Controllers {
 
         [HttpPost]
         public IActionResult Post([FromForm] FileUploadModel user) {
-            string clientIp = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+            string clientIp = Request.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
 
             Dictionary<string, dynamic> logInfo = new Dictionary<string, dynamic> {
                 { "Ip", clientIp }
@@ -50,7 +50,7 @@ namespace SynWord_Server_CSharp.Controllers {
                 _usageLog.CheckIpExistsIfNotThenCreate(clientIp);
 
                 string path = ContentRootPath.Path + @"/Files/UploadedFiles/";
-                string filePath = path + _fileId + "_" + "UniqueUp";
+                string filePath = path + _fileId + "_" + "UniqueUp" + "_" + user.Files.FileName;
 
                 if (!Directory.Exists(path)) {
                     Directory.CreateDirectory(path);
@@ -100,7 +100,7 @@ namespace SynWord_Server_CSharp.Controllers {
 
         [HttpPost("auth")]
         public IActionResult Authorized([FromForm] AuthFileUploadModel user) {
-            string clientIp = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+            string clientIp = Request.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
 
             Dictionary<string, dynamic> logInfo = new Dictionary<string, dynamic> {
                 { "Ip", clientIp },
@@ -131,7 +131,7 @@ namespace SynWord_Server_CSharp.Controllers {
                 }
 
                 string path = ContentRootPath.Path + @"/Files/UploadedFiles/";
-                string filePath = path + _fileId + "_" + "UniqueUp_Auth";
+                string filePath = path + _fileId + "_" + "UniqueUp_Auth" + "_" + user.Files.FileName;
 
                 if (!Directory.Exists(path)) {
                     Directory.CreateDirectory(path);

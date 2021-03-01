@@ -17,7 +17,7 @@ namespace SynWord_Server_CSharp.Controllers {
 
         [HttpPost]
         public ActionResult GetUserData([FromBody] string accessToken) {
-            string clientIp = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+            string clientIp = Request.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
 
             Dictionary<string, dynamic> logInfo = new Dictionary<string, dynamic> {
                 { "Ip", clientIp },

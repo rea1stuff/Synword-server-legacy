@@ -9,11 +9,28 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="wwwroot\**" />
-    <Content Remove="wwwroot\**" />
-    <EmbeddedResource Remove="wwwroot\**" />
-    <None Remove="wwwroot\**" />
+    <None Remove="Files\**" />
+
+    <Content Include="Files\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
+
+  <Target Name="RemoveLogFolder" AfterTargets="Build">
+    <RemoveDir Directories="$(OutDir)Files\Log" Condition="Exists('$(OutDir)Files\Log')" />
+  </Target>
+
+  <Target Name="RemoveUplFilesFolder" AfterTargets="Build">
+    <RemoveDir Directories="$(OutDir)Files\UploadedFiles" Condition="Exists('$(OutDir)Files\UploadedFiles')" />
+  </Target>
+
+  <Target Name="CreateLogFolder" AfterTargets="Build">
+    <MakeDir Directories="$(OutDir)Files\Log" Condition="!Exists('$(OutDir)Files\Log')" />
+  </Target>
+
+  <Target Name="CreateUplFilesFolder" AfterTargets="Build">
+    <MakeDir Directories="$(OutDir)Files\UploadedFiles" Condition="!Exists('$(OutDir)Files\UploadedFiles')" />
+  </Target>
 
   <ItemGroup>
     <PackageReference Include="DocumentFormat.OpenXml" Version="2.11.3" />
@@ -22,6 +39,11 @@
     <PackageReference Include="MongoDB.Driver" Version="2.11.3" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Files\Log\" />
+    <Folder Include="Files\UploadedFiles\" />
   </ItemGroup>
 
 
