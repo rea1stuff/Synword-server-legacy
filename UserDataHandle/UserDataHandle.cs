@@ -17,24 +17,6 @@ namespace SynWord_Server_CSharp.UserData {
             this.uId = uId;
         }
 
-        //public void ResetDefaults()
-        //{
-        //    if (_getUserData.GetUniqueCheckRequests() < UserLimits.UniqueCheckRequests)
-        //    {
-        //        _setUserData.SetUniqueCheckRequest(UserLimits.UniqueCheckRequests);
-        //    }
-
-        //    if (_getUserData.GetUniqueUpRequests() < UserLimits.UniqueUpRequests)
-        //    {
-        //        _setUserData.SetUniqueUpRequest(UserLimits.UniqueUpRequests);
-        //    }
-
-        //    if (_getUserData.GetDocumentUniqueUpRequests() < UserLimits.DocumentUniqueUpRequests)
-        //    {
-        //        _setUserData.SetDocumentUniqueUpRequests(UserLimits.DocumentUniqueUpRequests);
-        //    }
-        //}
-
         public bool IsUserExist() {
             IMongoDatabase database = _client.GetDatabase("synword");
             IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("userData");

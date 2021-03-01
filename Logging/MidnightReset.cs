@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Configuration;
+using SynWord_Server_CSharp.UserDataHandle;
 
 namespace SynWord_Server_CSharp.Logging {
     public class MidnightReset {
@@ -35,6 +36,9 @@ namespace SynWord_Server_CSharp.Logging {
             new FreeSynonimizerUsageLog().ResetNumberOfUsesIn24Hours();
             new UniqueCheckUsageLog().ResetNumberOfUsesIn24Hours();
             new VisitsLog().ResetNumberOfUsesIn24Hours();
+            new UserRequestReset().ResetUpRequest();
+            new UserRequestReset().ResetUniqueCheckRequest();
+            new UserRequestReset().ResetDocumentUniqueUpRequest();
         }
 
         private void ChangeLastLogResetDate() {
