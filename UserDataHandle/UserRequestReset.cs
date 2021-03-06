@@ -14,38 +14,14 @@ namespace SynWord_Server_CSharp.UserData {
         }
 
         public void ResetUniqueCheckRequest() {
-            IMongoDatabase database = _client.GetDatabase("synword");
-            IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("userData");
-            BsonDocument filter = new BsonDocument();
-
-            List<BsonDocument> documentList = collection.Find(filter).ToList();
-
-            foreach (BsonDocument document in documentList) {
-                if (Convert.ToInt32(document["uniqueCheckRequests"]) < UserLimits.UniqueCheckRequests) {
-                    filter = new BsonDocument("_id", new ObjectId(Convert.ToString(document["_id"])));
-                    BsonDocument update = new BsonDocument("$set", new BsonDocument { { "uniqueCheckRequests", UserLimits.UniqueCheckRequests } });
-                    collection.UpdateOne(filter, update);
-                }
-            }
+            Reset("uniqueCheckRequests", UserLimits.UniqueUpRequests, PremiumUserLimits.UniqueCheckRequests);
         }
 
         public void ResetUpRequest() {
-            IMongoDatabase database = _client.GetDatabase("synword");
-            IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("userData");
-            BsonDocument filter = new BsonDocument();
-
-            List<BsonDocument> documentList = collection.Find(filter).ToList();
-
-            foreach (BsonDocument document in documentList) {
-                if (Convert.ToInt32(document["uniqueUpRequests"]) < UserLimits.UniqueUpRequests) {
-                    filter = new BsonDocument("_id", new ObjectId(Convert.ToString(document["_id"])));
-                    BsonDocument update = new BsonDocument("$set", new BsonDocument { { "uniqueUpRequests", UserLimits.UniqueUpRequests } });
-                    collection.UpdateOne(filter, update);
-                }
-            }
+            Reset("uniqueUpRequests", UserLimits.UniqueUpRequests, UserLimits.UniqueUpRequests);
         }
 
-        public void ResetDocumentUniqueUpRequest() {
+        public void Reset(string fieldName, int value, int premiumValue) {
             IMongoDatabase database = _client.GetDatabase("synword");
             IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("userData");
             BsonDocument filter = new BsonDocument();
@@ -53,9 +29,12 @@ namespace SynWord_Server_CSharp.UserData {
             List<BsonDocument> documentList = collection.Find(filter).ToList();
 
             foreach (BsonDocument document in documentList) {
-                if (Convert.ToInt32(document["documentUniqueUpRequests"]) < UserLimits.DocumentUniqueUpRequests) {
+                if (Convert.ToBoolean(document["isPremium"]) == true) {
+                    value = premiumValue;
+                }
+                if (Convert.ToInt32(document[fieldName]) < value) {
                     filter = new BsonDocument("_id", new ObjectId(Convert.ToString(document["_id"])));
-                    BsonDocument update = new BsonDocument("$set", new BsonDocument { { "documentUniqueUpRequests", UserLimits.DocumentUniqueUpRequests } });
+                    BsonDocument update = new BsonDocument("$set", new BsonDocument { { fieldName, value } });
                     collection.UpdateOne(filter, update);
                 }
             }

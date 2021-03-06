@@ -38,7 +38,6 @@ namespace SynWord_Server_CSharp.Logging {
             new VisitsLog().ResetNumberOfUsesIn24Hours();
             new UserRequestReset().ResetUpRequest();
             new UserRequestReset().ResetUniqueCheckRequest();
-            new UserRequestReset().ResetDocumentUniqueUpRequest();
         }
 
         private void ChangeLastLogResetDate() {

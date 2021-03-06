@@ -28,7 +28,6 @@ namespace SynWord_Server_CSharp.UserData {
             userDataModel.isPremium = userData[0]["isPremium"].ToBoolean();
             userDataModel.uniqueCheckRequests = userData[0]["uniqueCheckRequests"].ToInt32();
             userDataModel.uniqueUpRequests = userData[0]["uniqueUpRequests"].ToInt32();
-            userDataModel.documentUniqueUpRequests = userData[0]["documentUniqueUpRequests"].ToInt32();
             userDataModel.documentMaxSymbolLimit = userData[0]["documentMaxSymbolLimit"].ToInt32();
             userDataModel.uniqueCheckMaxSymbolLimit = userData[0]["uniqueCheckMaxSymbolLimit"].ToInt32();
             userDataModel.uniqueUpMaxSymbolLimit = userData[0]["uniqueUpMaxSymbolLimit"].ToInt32();
@@ -45,9 +44,6 @@ namespace SynWord_Server_CSharp.UserData {
             return Get("uniqueUpRequests");
         }
 
-        public int GetDocumentUniqueUpRequests() {
-            return Get("documentUniqueUpRequests");
-        }
         public int GetDocumentMaxSymbolLimit() {
             return Get("documentMaxSymbolLimit");
         }

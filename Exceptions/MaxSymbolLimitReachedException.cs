@@ -4,7 +4,7 @@ namespace SynWord_Server_CSharp.Exceptions
 {
     public class MaxSymbolLimitReachedException : Exception
     {
-        const string message = "Max symbol limit reached";
+        const string message = "maxSymbolLimitReached";
 
         public MaxSymbolLimitReachedException() : base(message) {}
     }

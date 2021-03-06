@@ -4,7 +4,6 @@
         public bool isPremium { get; set; }
         public int uniqueCheckRequests { get; set; }
         public int uniqueUpRequests { get; set; }
-        public int documentUniqueUpRequests { get; set; }
         public int documentMaxSymbolLimit { get; set; }
         public int uniqueCheckMaxSymbolLimit { get; set; }
         public int uniqueUpMaxSymbolLimit { get; set; }

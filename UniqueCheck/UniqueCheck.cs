@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 namespace SynWord_Server_CSharp.UniqueCheck {
     public class UniqueCheckApi {
         private UniqueCheckFromContentWatchApi _uniqueCheck = new UniqueCheckFromContentWatchApi();
-        private int _contentWatchApiInputRestriction = 19999;
+        private int _contentWatchApiInputRestriction = 20000;
 
         public async Task<UniqueCheckResponseModel> UniqueCheck(string text) {
             //В каждом элементе текст до 20 тыс. символов (огрничение api)
@@ -53,15 +53,17 @@ namespace SynWord_Server_CSharp.UniqueCheck {
             int endIndex = _contentWatchApiInputRestriction;
             bool flag = true;
             while (flag) {
-                if (text.Length < _contentWatchApiInputRestriction) {
+                if (text.Length <= _contentWatchApiInputRestriction) {
                     endIndex = text.Length;
                     flag = false;
                 }
 
-                string temp = text.Substring(0, endIndex);
-                splitText.Add(temp);
+                if (text.Length > 100) {
+                    string temp = text.Substring(0, endIndex);
+                    splitText.Add(temp);
 
-                text = text.Substring(endIndex);
+                    text = text.Substring(endIndex);
+                }
             }
 
             return splitText;

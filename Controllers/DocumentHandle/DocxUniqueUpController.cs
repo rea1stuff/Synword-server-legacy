@@ -56,7 +56,7 @@ namespace SynWord_Server_CSharp.Controllers {
                     Directory.CreateDirectory(path);
                 }
 
-                if (_usageLog.GetUsesIn24Hours(clientIp) > UserLimits.DocumentUniqueUpRequests) {
+                if (_usageLog.GetUsesIn24Hours(clientIp) > UserLimits.UniqueUpRequests) {
                     throw new DailyLimitReachedException();
                 }
 
@@ -124,14 +124,14 @@ namespace SynWord_Server_CSharp.Controllers {
                     throw new Exception("Invalid file extension");
                 }
 
-                int requestsLeft = _getUserData.GetDocumentUniqueUpRequests();
+                int requestsLeft = _getUserData.GetUniqueUpRequests();
 
                 if (requestsLeft <= 0) {
                     throw new DailyLimitReachedException();
                 }
 
                 string path = ContentRootPath.Path + @"/Files/UploadedFiles/";
-                string filePath = path + _fileId + "_" + "UniqueUp_Auth" + "_" + user.Files.FileName;
+                string filePath = path + _fileId + "_" + "AuthUniqueUp" + "_" + user.Files.FileName;
 
                 if (!Directory.Exists(path)) {
                     Directory.CreateDirectory(path);
@@ -151,7 +151,7 @@ namespace SynWord_Server_CSharp.Controllers {
                 string mimeType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
                 FileStream stream = System.IO.File.OpenRead(filePath);
 
-                _setUserData.SetDocumentUniqueUpRequests(--requestsLeft);
+                _setUserData.SetUniqueUpRequest(requestsLeft - 2);
 
                 RequestLogger.Add(new RequestStatusLog(RequestTypes.DocxUniqueUpAuth, logInfo, RequestStatuses.Completed));
 

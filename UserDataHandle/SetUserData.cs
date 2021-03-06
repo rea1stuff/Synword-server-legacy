@@ -4,6 +4,7 @@ using System.Linq;
 using System.Configuration;
 using MongoDB.Driver;
 using MongoDB.Bson;
+using SynWord_Server_CSharp.Constants;
 
 namespace SynWord_Server_CSharp.UserData {
     public class SetUserData {
@@ -15,6 +16,16 @@ namespace SynWord_Server_CSharp.UserData {
         }
 
         public void SetPremium() {
+            SetPremiumIsTrue();
+
+            SetUniqueCheckMaxSymbolLimit(PremiumUserLimits.UniqueCheckMaxSymbolLimit);
+            SetUniqueUpMaxSymbolLimit(PremiumUserLimits.UniqueUpMaxSymbolLimit);
+
+            SetUniqueUpRequest(PremiumUserLimits.UniqueUpRequests);
+            SetUniqueCheckRequest(PremiumUserLimits.UniqueCheckRequests);
+        }
+
+        private void SetPremiumIsTrue() {
             List<BsonDocument> userData = GetData();
 
             var filter = new BsonDocument("uId", uId);
@@ -38,9 +49,6 @@ namespace SynWord_Server_CSharp.UserData {
             SetRequests("uniqueUpRequests", count);
         }
 
-        public void SetDocumentUniqueUpRequests(int count) {
-            SetRequests("documentUniqueUpRequests", count);
-        }
         public void SetUniqueCheckMaxSymbolLimit(int count) {
             SetMaxSymbolLimit("uniqueCheckMaxSymbolLimit", count);
         }

@@ -95,7 +95,7 @@ namespace SynWord_Server_CSharp.Controllers {
 
                 string response = JsonConvert.SerializeObject(uniqueCheckResponse);
 
-                _setUserData.SetUniqueCheckRequest(--requestsLeft);
+                _setUserData.SetUniqueCheckRequest(requestsLeft - 2);
 
                 RequestLogger.Add(new RequestStatusLog(RequestTypes.DocxUniqueCheck, logInfo, RequestStatuses.Completed));
 
