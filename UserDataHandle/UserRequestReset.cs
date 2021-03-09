@@ -14,11 +14,11 @@ namespace SynWord_Server_CSharp.UserData {
         }
 
         public void ResetUniqueCheckRequest() {
-            Reset("uniqueCheckRequests", UserLimits.UniqueUpRequests, PremiumUserLimits.UniqueCheckRequests);
+            Reset("uniqueCheckRequests", UserLimits.UniqueCheckRequests, PremiumUserLimits.UniqueCheckRequests);
         }
 
         public void ResetUpRequest() {
-            Reset("uniqueUpRequests", UserLimits.UniqueUpRequests, UserLimits.UniqueUpRequests);
+            Reset("uniqueUpRequests", UserLimits.UniqueUpRequests, PremiumUserLimits.UniqueUpRequests);
         }
 
         public void Reset(string fieldName, int value, int premiumValue) {

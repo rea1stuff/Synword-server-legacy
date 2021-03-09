@@ -8,66 +8,52 @@ using Newtonsoft.Json;
 using SynWord_Server_CSharp.Exceptions;
 using SynWord_Server_CSharp.Model;
 
-namespace SynWord_Server_CSharp.GoogleApi
-{
-    public class GoogleOauth2Api
-    {
+namespace SynWord_Server_CSharp.GoogleApi {
+    public class GoogleOauth2Api {
         private const string GoogleApiTokenInfoUrl = "https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token={0}";
-        public bool IsTokenExist(string uId)
-        {
+        public bool IsTokenExist(string uId) {
             HttpClient httpClient = new HttpClient();
             var requestUri = new Uri(string.Format(GoogleApiTokenInfoUrl, uId));
 
             HttpResponseMessage httpResponseMessage;
-            try
-            {
+            try {
                 httpResponseMessage = httpClient.GetAsync(requestUri).Result;
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 Console.WriteLine(ex.Message);
                 throw new Exception(ex.Message);
             }
 
-            if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
-            {
+            if (httpResponseMessage.StatusCode != HttpStatusCode.OK) {
                 return false;
             }
 
             return true;
         }
 
-        public GoogleUserModel GetUserDetails(string accessToken)
-        {
+        public GoogleUserModel GetUserDetails(string accessToken) {
             var googleUserModel = GetGoogleUserModel(accessToken);
 
             return googleUserModel;
         }
 
-        public string GetUserId(string accessToken)
-        {
+        public string GetUserId(string accessToken) {
             var googleUserModel = GetGoogleUserModel(accessToken);
 
             return googleUserModel.id;
         }
 
-        private GoogleUserModel GetGoogleUserModel(string accessToken)
-        {
+        private GoogleUserModel GetGoogleUserModel(string accessToken) {
             HttpClient httpClient = new HttpClient();
             var requestUri = new Uri(string.Format(GoogleApiTokenInfoUrl, accessToken));
 
             HttpResponseMessage httpResponseMessage;
-            try
-            {
+            try {
                 httpResponseMessage = httpClient.GetAsync(requestUri).Result;
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 throw new Exception(ex.Message);
             }
 
-            if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
-            {
+            if (httpResponseMessage.StatusCode != HttpStatusCode.OK) {
                 throw new InvalidAccessTokenException();
             }
             var response = httpResponseMessage.Content.ReadAsStringAsync().Result;
