@@ -3,22 +3,20 @@ using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace SynWord_Server_CSharp.DocumentHandling.Docx {
     public class DocxGet {
-        private int _symbolCount;
-
-        public int GetDocSymbolCount(string documentPath) {
-            _symbolCount = 0;
+        public static int GetSymbolCount(string documentPath) {
+            int symbolCount = 0;
 
             using (WordprocessingDocument document = WordprocessingDocument.Open(documentPath, true)) {
                 Body body = document.MainDocumentPart.Document.Body;
 
                 foreach (Text text in body.Descendants<Text>()) {
-                    _symbolCount += text.Text.Length;
+                    symbolCount += text.Text.Length;
                 }
             }
 
-            return _symbolCount;
+            return symbolCount;
         }
-        public string GetDocText(string documentPath) {
+        public static string GetText(string documentPath) {
             string docText = "";
 
             using (WordprocessingDocument document = WordprocessingDocument.Open(documentPath, true)) {

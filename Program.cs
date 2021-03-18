@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using SynWord_Server_CSharp.Synonymize;
 using SynWord_Server_CSharp.Logging;
+using SynWord_Server_CSharp.DailyCoins;
 
 namespace SynWord_Server_CSharp {
     public class Program {

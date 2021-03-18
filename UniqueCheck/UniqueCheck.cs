@@ -51,11 +51,11 @@ namespace SynWord_Server_CSharp.UniqueCheck {
         private List<string> GetSplitText(string text) {
             List<string> splitText = new List<string>();
             int endIndex = _contentWatchApiInputRestriction;
-            bool flag = true;
-            while (flag) {
+            bool textIsNotEmpty = true;
+            while (textIsNotEmpty) {
                 if (text.Length <= _contentWatchApiInputRestriction) {
                     endIndex = text.Length;
-                    flag = false;
+                    textIsNotEmpty = false;
                 }
 
                 if (text.Length > 100) {

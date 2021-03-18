@@ -5,40 +5,52 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using SynWord_Server_CSharp.Model.Purchase;
-using SynWord_Server_CSharp.UserData;
 using SynWord_Server_CSharp.Exceptions;
 using SynWord_Server_CSharp.GoogleApi;
+using SynWord_Server_CSharp.UserDataHandlers;
+using SynWord_Server_CSharp.Model.UserData;
 
 namespace SynWord_Server_CSharp.Controllers {
     [Route("api/[controller]")]
     [ApiController]
     public class PurchaseVerificationController : ControllerBase {
-        UserPaymentCheck paymentCheck = new UserPaymentCheck();
-        GoogleOauth2Api _googleApi = new GoogleOauth2Api();
-        SetUserData _setUserData;
-        GetUserData _getUserData;
+        UserApplicationDataHandler _dataHandler = new UserApplicationDataHandler();
 
         [HttpPost]
         public IActionResult Post([FromBody] PurchaseModel purchase) {
             try {
                 Console.WriteLine("Verification");
-                Console.WriteLine(purchase.AccessToken);
+                Console.WriteLine(purchase.Uid);
                 Console.WriteLine(purchase.ProductId);
                 Console.WriteLine(purchase.PurchaseToken);
-                string uId = _googleApi.GetUserId(purchase.AccessToken);
-                _getUserData = new GetUserData(uId);
-                _setUserData = new SetUserData(uId);
 
-                int uniqueCheckRequests = _getUserData.GetUniqueCheckRequests();
+                UserApplicationDataModel userData = _dataHandler.GetUserData(purchase.Uid);
 
-                paymentCheck.PaymentCheck(purchase.ProductId, purchase.PurchaseToken);
+                int coins = userData.coins;
+
+                UserPaymentHandler.PaymentVerify(purchase.ProductId, purchase.PurchaseToken);
 
                 switch (purchase.ProductId) {
-                    case "premium": _setUserData.SetPremium(); break;
-                    case "100_plagiarism_check": _setUserData.SetUniqueCheckRequest(uniqueCheckRequests + 100); break;
-                    case "300_plagiarism_check": _setUserData.SetUniqueCheckRequest(uniqueCheckRequests + 300); break;
-                    case "600_plagiarism_check": _setUserData.SetUniqueCheckRequest(uniqueCheckRequests + 600); break;
-                    case "1000_plagiarism_check": _setUserData.SetUniqueCheckRequest(uniqueCheckRequests + 1000); break;
+                    case "premium": _dataHandler.SetPremium(userData.uId); break;
+                    case "100_coins": {
+                            userData.coins += 100;
+                            _dataHandler.SetUserData(userData);
+                                } break;
+                    case "300_coins": {
+                            userData.coins += 300;
+                            _dataHandler.SetUserData(userData);
+                        }
+                        break;
+                    case "600_coins": {
+                            userData.coins += 600;
+                            _dataHandler.SetUserData(userData);
+                        }
+                        break;
+                    case "1000_coins": {
+                            userData.coins += 1000;
+                            _dataHandler.SetUserData(userData);
+                        }
+                        break;
                     default:
                         break;
                 }
