@@ -1,16 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using SynWord_Server_CSharp.Model;
-using SynWord_Server_CSharp.RequestProcessor.RequestValidators;
 using SynWord_Server_CSharp.Logging;
-using SynWord_Server_CSharp.Model.Log;
 using SynWord_Server_CSharp.Model.Request;
 using SynWord_Server_CSharp.Constants;
 using SynWord_Server_CSharp.RequestProcessor.RequestHandlers;
-using SynWord_Server_CSharp.Exceptions;
 using SynWord_Server_CSharp.RequestProcessor.RequestValidators.Documents;
 using SynWord_Server_CSharp.Model.Log.Documents;
 using SynWord_Server_CSharp.RequestProcessor.RequestHandlers.Documents;
@@ -18,14 +12,16 @@ using SynWord_Server_CSharp.DocumentHandling.Docx;
 
 namespace SynWord_Server_CSharp.RequestProcessor {
     public class DocxUniqueUpRequestProcessor {
-        IDocumentValidationControl _validationControl;
-        IDocumentRequestHandler _uniqueUp;
-        int _requestPrice = RequestPrices.DocumentUniqueUpPrice;
-        string _filePath;
+        private IDocumentValidationControl _validationControl;
+        private IDocumentRequestHandler _uniqueUp;
+        private int _requestPrice = RequestPrices.DocumentUniqueUpPrice;
+        private string _filePath;
+
         public DocxUniqueUpRequestProcessor(string filePath) {
             _filePath = filePath;
             _uniqueUp = new UniqueUpDocRequestHandler(filePath);
         }
+
         public async Task<IActionResult> UnauthUserRequestExecution(UnauthDocUniqueUpLogDataModel user) {
             try {
                 RequestLogger.Add(new RequestStatusLog(RequestTypes.DocxUniqueUp, user.ToDictionary(), RequestStatuses.Start));
@@ -54,6 +50,7 @@ namespace SynWord_Server_CSharp.RequestProcessor {
                 return RequestExceptionHandler.Handle(exception);
             }
         }
+
         public async Task<IActionResult> AuthUserRequestExecution(AuthDocUniqueUpLogDataModel user) {
             try {
                 RequestLogger.Add(new RequestStatusLog(RequestTypes.DocxUniqueUp, user.ToDictionary(), RequestStatuses.Start));

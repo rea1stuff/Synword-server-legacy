@@ -11,7 +11,8 @@ namespace SynWord_Server_CSharp.Controllers {
         string path = ContentRootPath.Path + @"/Files/UploadedFiles/";
         static private int counter = 0;
         private int _fileId;
-        DocxUniqueUpRequestProcessor processor;
+        private DocxUniqueUpRequestProcessor processor;
+
         public DocxUniqueUpController() {
             counter++;
             _fileId = counter;

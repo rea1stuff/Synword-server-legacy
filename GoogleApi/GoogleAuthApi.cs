@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using SynWord_Server_CSharp.Exceptions;
-using SynWord_Server_CSharp.Model;
 using SynWord_Server_CSharp.Model.UserData;
 
 namespace SynWord_Server_CSharp.GoogleApi {

@@ -1,13 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using SynWord_Server_CSharp.UserDataHandlers;
 using SynWord_Server_CSharp.GoogleApi;
 using SynWord_Server_CSharp.Model.UserData;
-using SynWord_Server_CSharp.DAO;
 
 namespace SynWord_Server_CSharp.Controllers {
     [Route("api/[controller]")]
@@ -32,6 +27,7 @@ namespace SynWord_Server_CSharp.Controllers {
                 return BadRequest(exception.Message);
             }
         }
+
         [HttpPost("auth")]
         public IActionResult AuthRegistration([FromBody] string accessToken) {
             string clientIp = Request.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();

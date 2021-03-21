@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using SynWord_Server_CSharp.Model;
+﻿using System.Collections.Generic;
 
 namespace SynWord_Server_CSharp.Model.Log {
     public class UnauthUserLogDataModel : IUserLogDataModel {
@@ -10,8 +6,11 @@ namespace SynWord_Server_CSharp.Model.Log {
             Ip = ip;
             UserModel = userModel;
         }
+
         public override string Ip { get; }
+
         public override IUserModel UserModel { get; set; }
+
         public override Dictionary<string, dynamic> ToDictionary() {
             return new Dictionary<string, dynamic> {
                 { "Ip", Ip },

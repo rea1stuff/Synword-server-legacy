@@ -1,7 +1,4 @@
-﻿using System;
-
-namespace SynWord_Server_CSharp.Exceptions
-{
+﻿namespace SynWord_Server_CSharp.Exceptions {
     public class DailyLimitReachedException : UserException {
         const string message = "dailyLimitReached";
 

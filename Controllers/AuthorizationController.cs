@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
-using SynWord_Server_CSharp.GoogleApi;
 using SynWord_Server_CSharp.Exceptions;
 using System.Collections.Generic;
 using SynWord_Server_CSharp.Logging;
@@ -14,7 +13,7 @@ namespace SynWord_Server_CSharp.Controllers {
     [Route("api/[controller]")]
     [ApiController]
     public class AuthorizationController : ControllerBase {
-        IDailyCoinsGet coinsGet;
+        private IDailyCoinsGet coinsGet;
         
         [HttpPost]
         public IActionResult GetUserData([FromBody] string uId) {
@@ -55,6 +54,7 @@ namespace SynWord_Server_CSharp.Controllers {
                 }
             }
         }
+
         [HttpPost("auth")]
         public IActionResult GetAuthUserData([FromBody] string uId) {
             string clientIp = Request.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();

@@ -2,16 +2,14 @@
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using SynWord_Server_CSharp.Model.UserData;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using SynWord_Server_CSharp.Exceptions;
 
 namespace SynWord_Server_CSharp.DAO {
     public class UserApplicationDataDao : IDao<UserApplicationDataModel> {
-        IMongoDatabase _db;
-        IMongoCollection <BsonDocument> _collection;
+        private IMongoDatabase _db;
+        private IMongoCollection<BsonDocument> _collection;
 
         public UserApplicationDataDao() {
             _db = DB.client.GetDatabase("synword");

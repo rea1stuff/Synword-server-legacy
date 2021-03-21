@@ -5,7 +5,7 @@ using SynWord_Server_CSharp.Synonymize;
 namespace SynWord_Server_CSharp.DocumentHandling.Docx {
     public class DocxUniqueUp {
         public static void UniqueUp(string documentPath) {
-            ISynonymizer _synonymizer = new FreeSynonymizer();
+            Synonymizer _synonymizer = new RussianSynonymizer();
 
             using (WordprocessingDocument document = WordprocessingDocument.Open(documentPath, true)) {
                 Body body = document.MainDocumentPart.Document.Body;

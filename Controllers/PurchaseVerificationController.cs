@@ -54,6 +54,7 @@ namespace SynWord_Server_CSharp.Controllers {
                     default:
                         break;
                 }
+
                 Console.WriteLine("Completed");
                 return Ok();
             } catch (InvalidPurchaseTokenException ex) {

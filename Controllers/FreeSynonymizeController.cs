@@ -1,7 +1,6 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using SynWord_Server_CSharp.UniqueCheck;
+using Newtonsoft.Json;
 using SynWord_Server_CSharp.Model;
 using SynWord_Server_CSharp.Model.Log;
 using SynWord_Server_CSharp.RequestProcessor;
@@ -12,6 +11,7 @@ namespace SynWord_Server_CSharp.Controllers {
     public class FreeSynonymizeController : ControllerBase {
         IUserLogDataModel userLogModel;
         UniqueUpRequestProcessor _requestProcessor = new UniqueUpRequestProcessor();
+
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] UnauthUserModel user) {
             string clientIp = Request.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();

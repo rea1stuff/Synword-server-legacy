@@ -1,7 +1,5 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using SynWord_Server_CSharp.UniqueCheck;
 using SynWord_Server_CSharp.Model;
 using SynWord_Server_CSharp.Model.Log;
 using SynWord_Server_CSharp.RequestProcessor;
@@ -10,8 +8,9 @@ namespace SynWord_Server_CSharp.Controllers {
     [Route("api/[controller]")]
     [ApiController]
     public class UniqueCheckController : ControllerBase {
-        IUserLogDataModel userLogModel;
-        UniqueCheckRequestProcessor requestProcessor = new UniqueCheckRequestProcessor();
+        private IUserLogDataModel userLogModel;
+        private UniqueCheckRequestProcessor requestProcessor = new UniqueCheckRequestProcessor();
+
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] UnauthUserModel user) {
             string clientIp = Request.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();

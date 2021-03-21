@@ -5,7 +5,7 @@ namespace SynWord_Server_CSharp.Model.UniqueUp {
         [JsonProperty("text")]
         public string Text { get; set; }
         [JsonProperty("replaced")]
-        public WordModel[] Replaced { get; set; }
+        public ReplacedWordModel[] Replaced { get; set; }
         [JsonProperty("replacedCount")]
         public int ReplacedCount { get; set; }
     }

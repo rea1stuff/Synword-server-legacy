@@ -6,25 +6,30 @@ using SynWord_Server_CSharp.Model;
 using SynWord_Server_CSharp.Model.UniqueUp;
 
 namespace SynWord_Server_CSharp.Synonymize {
-    class FreeSynonymizer : ISynonymizer {
-        public async Task<UniqueUpResponseModel> SynonymizeAsync(string text) {
+    class RussianSynonymizer : Synonymizer {
+        public override async Task<UniqueUpResponseModel> SynonymizeAsync(string text) {
             return await Task.Run(() => Synonymize(text));
         }
 
-        public UniqueUpResponseModel Synonymize(string text) {
+        public override UniqueUpResponseModel Synonymize(string text) {
             StringBuilder textBuilder = new StringBuilder(text);
             List<WordModel> words = GetWordsFromText(text);
-            List<WordModel> replaced = new List<WordModel>();
+            List<ReplacedWordModel> replaced = new List<ReplacedWordModel>();
             int replacedCount = 0;
             int difference = 0;
 
             for (int i = 0; i < words.Count; i++) {
                 string word = textBuilder.ToString(words[i].StartIndex + difference, words[i].EndIndex + 1 - words[i].StartIndex);
 
-                int index = BinarySearch(SynonymDictionary.dictionary, word.ToLower(), 0, SynonymDictionary.dictionary.Count - 1);
+                int index = BinarySearch(SynonymDictionary.russianDictionary, word.ToLower(), 0, SynonymDictionary.russianDictionary.Count - 1);
 
                 if (index >= 0) {
-                    string synonym = SynonymDictionary.dictionary[SynonymDictionary.dictionary[index].SynonymId].Word;
+                    string synonym = SynonymDictionary.russianDictionary[SynonymDictionary.russianDictionary[index].SynonymId].Word;
+
+                    List<string> synonyms = new List<string>();
+                    synonyms.Add(word);
+                    synonyms.Add(synonym);
+
                     if (char.IsUpper(word[0])) {
                         synonym = char.ToUpper(synonym[0]) + synonym.Substring(1);
                     }
@@ -32,7 +37,7 @@ namespace SynWord_Server_CSharp.Synonymize {
                     textBuilder.Remove(words[i].StartIndex + difference, words[i].EndIndex + 1 - words[i].StartIndex);
                     textBuilder.Insert(words[i].StartIndex + difference, synonym);
 
-                    replaced.Add(new WordModel(words[i].StartIndex + difference, words[i].StartIndex + difference + synonym.Length - 1));
+                    replaced.Add(new ReplacedWordModel(new WordModel(words[i].StartIndex + difference, words[i].StartIndex + difference + synonym.Length - 1), synonyms));
 
                     int wordLength = words[i].EndIndex + 1 - words[i].StartIndex;
                     int synonymLength = synonym.Length;
@@ -50,7 +55,7 @@ namespace SynWord_Server_CSharp.Synonymize {
             return uniqueUpResponse;
         }
 
-        private int BinarySearch(List<Synonym> synonyms, string word, int left, int right) {
+        private int BinarySearch(List<RussianSynonym> synonyms, string word, int left, int right) {
             if (left <= right) {
                 int midle = left + (right - left) / 2;
 
@@ -66,31 +71,6 @@ namespace SynWord_Server_CSharp.Synonymize {
             } else {
                 return -1;
             }
-        }
-
-        private List<WordModel> GetWordsFromText(string text) {
-            List<WordModel> words = new List<WordModel>();
-
-            int start = -1;
-
-            for (int i = 0; i < text.Length; i++) {
-                if (start < 0) {
-                    if (!new char[] { ' ', '\n', '\r' }.Contains(text[i]) && !char.IsPunctuation(text[i])) {
-                        start = i;
-                    }
-                } else {
-                    if (new char[] { ' ', '\n', '\r' }.Contains(text[i]) || char.IsPunctuation(text[i])) {
-                        words.Add(new WordModel(start, i - 1));
-                        start = -1;
-                    }
-                }
-            }
-
-            if (start >= 0) {
-                words.Add(new WordModel(start, text.Length - 1));
-            }
-
-            return words;
         }
     }
 }

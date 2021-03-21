@@ -1,15 +1,12 @@
-﻿using System;
-using MongoDB.Bson;
-using MongoDB.Driver;
-using System.Collections.Generic;
-using System.Configuration;
+﻿using System.Collections.Generic;
 using SynWord_Server_CSharp.Constants;
 using SynWord_Server_CSharp.DAO;
 using SynWord_Server_CSharp.Model.UserData;
 
 namespace SynWord_Server_CSharp.DailyCoins {
     public class UnauthUserCoinsReset {
-        IDao<UnauthUserApplicationDataModel> _unauthDao = new UnauthUserApplicationDataDao();
+        private IDao<UnauthUserApplicationDataModel> _unauthDao = new UnauthUserApplicationDataDao();
+
         public void ResetCoinsCount() {
             Reset();
         }

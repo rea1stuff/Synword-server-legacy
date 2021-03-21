@@ -17,6 +17,7 @@ namespace SynWord_Server_CSharp.RequestProcessor {
         IValidationControl _validationControl;
         IRequestHandler _uniqueUp = new UniqueUpRequestHandler();
         int _requestPrice = RequestPrices.UniqueUpPrice;
+
         public async Task<IActionResult> UnauthUserRequestExecution(IUserLogDataModel user) {
             try {
                 RequestLogger.Add(new RequestStatusLog(RequestTypes.UniqueUp, user.ToDictionary(), RequestStatuses.Start));
@@ -41,6 +42,7 @@ namespace SynWord_Server_CSharp.RequestProcessor {
                 return RequestExceptionHandler.Handle(exception);
             }
         }
+
         public async Task<IActionResult> AuthUserRequestExecution(IUserLogDataModel user) {
             try {
                 RequestLogger.Add(new RequestStatusLog(RequestTypes.UniqueUp, user.ToDictionary(), RequestStatuses.Start));

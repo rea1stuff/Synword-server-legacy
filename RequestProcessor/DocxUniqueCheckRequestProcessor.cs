@@ -1,16 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using SynWord_Server_CSharp.Model;
-using SynWord_Server_CSharp.RequestProcessor.RequestValidators;
 using SynWord_Server_CSharp.Logging;
-using SynWord_Server_CSharp.Model.Log;
 using SynWord_Server_CSharp.Model.Request;
 using SynWord_Server_CSharp.Constants;
 using SynWord_Server_CSharp.RequestProcessor.RequestHandlers;
-using SynWord_Server_CSharp.Exceptions;
 using SynWord_Server_CSharp.RequestProcessor.RequestValidators.Documents;
 using SynWord_Server_CSharp.Model.Log.Documents;
 using SynWord_Server_CSharp.RequestProcessor.RequestHandlers.Documents;
@@ -18,14 +12,16 @@ using SynWord_Server_CSharp.DocumentHandling.Docx;
 
 namespace SynWord_Server_CSharp.RequestProcessor {
     public class DocxUniqueCheckRequestProcessor {
-        IDocumentValidationControl _validationControl;
-        IDocumentRequestHandler _uniqueCheck;
-        int _requestPrice = RequestPrices.DocumentUniqueCheckPrice;
-        string _filePath;
+        private IDocumentValidationControl _validationControl;
+        private IDocumentRequestHandler _uniqueCheck;
+        private int _requestPrice = RequestPrices.DocumentUniqueCheckPrice;
+        private string _filePath;
+
         public DocxUniqueCheckRequestProcessor(string filePath) {
             _filePath = filePath;
             _uniqueCheck = new UniqueCheckDocRequestHandler(filePath);
         }
+
         public async Task<IActionResult> AuthUserRequestExecution(DocUniqueCheckLogDataModel user) {
             try {
                 RequestLogger.Add(new RequestStatusLog(RequestTypes.DocxUniqueCheck, user.ToDictionary(), RequestStatuses.Start));

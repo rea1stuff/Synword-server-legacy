@@ -3,15 +3,13 @@ using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using SynWord_Server_CSharp.Exceptions;
 using SynWord_Server_CSharp.Model.UserData;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace SynWord_Server_CSharp.DAO {
     public class UserGoogleDataDao : IDao<UserGoogleDataModel> {
-        IMongoDatabase _db;
-        IMongoCollection<BsonDocument> _collection;
+        private IMongoDatabase _db;
+        private IMongoCollection<BsonDocument> _collection;
 
         public UserGoogleDataDao() {
             _db = DB.client.GetDatabase("synword");

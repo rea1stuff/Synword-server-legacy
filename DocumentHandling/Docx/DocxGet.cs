@@ -16,6 +16,7 @@ namespace SynWord_Server_CSharp.DocumentHandling.Docx {
 
             return symbolCount;
         }
+
         public static string GetText(string documentPath) {
             string docText = "";
 

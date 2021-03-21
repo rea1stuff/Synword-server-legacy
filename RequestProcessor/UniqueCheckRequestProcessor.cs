@@ -1,22 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using SynWord_Server_CSharp.Model;
 using SynWord_Server_CSharp.RequestProcessor.RequestValidators;
 using SynWord_Server_CSharp.Logging;
 using SynWord_Server_CSharp.Model.Log;
 using SynWord_Server_CSharp.Model.Request;
 using SynWord_Server_CSharp.Constants;
 using SynWord_Server_CSharp.RequestProcessor.RequestHandlers;
-using SynWord_Server_CSharp.Exceptions;
 
 namespace SynWord_Server_CSharp.RequestProcessor {
     public class UniqueCheckRequestProcessor {
-        IValidationControl _validationControl;
-        IRequestHandler _uniqueCheck = new UniqueCheckRequestHandler();
-        int _requestPrice = RequestPrices.UniqueCheckPrice;
+        private IValidationControl _validationControl;
+        private IRequestHandler _uniqueCheck = new UniqueCheckRequestHandler();
+        private int _requestPrice = RequestPrices.UniqueCheckPrice;
+
         public async Task<IActionResult> UnauthUserRequestExecution(IUserLogDataModel user) {
             try {
                 RequestLogger.Add(new RequestStatusLog(RequestTypes.UniqueCheck, user.ToDictionary(), RequestStatuses.Start));
@@ -41,6 +38,7 @@ namespace SynWord_Server_CSharp.RequestProcessor {
                 return RequestExceptionHandler.Handle(exception);
             }
         }
+
         public async Task<IActionResult> AuthUserRequestExecution(IUserLogDataModel user) {
             try {
                 RequestLogger.Add(new RequestStatusLog(RequestTypes.UniqueCheck, user.ToDictionary(), RequestStatuses.Start));
