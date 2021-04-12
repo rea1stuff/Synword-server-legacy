@@ -1,18 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Configuration;
-using MongoDB.Driver;
-using MongoDB.Bson;
 using SynWord_Server_CSharp.Constants;
-using SynWord_Server_CSharp.GoogleApi;
 using SynWord_Server_CSharp.DAO;
 using SynWord_Server_CSharp.Model.UserData;
 using SynWord_Server_CSharp.InternalUserToken;
 
 namespace SynWord_Server_CSharp.UserDataHandlers {
-    public class UnauthUserApplicationDataHandler : IUserDataHandler<UnauthUserApplicationDataModel> {
-        IDao<UnauthUserApplicationDataModel> _db;
+    public class UnauthUserApplicationDataHandler {
+        IUnauthUserDao _db;
         string token;
         public UnauthUserApplicationDataHandler() {
             _db = new UnauthUserApplicationDataDao();

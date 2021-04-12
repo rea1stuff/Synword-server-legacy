@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 
-namespace SynWord_Server_CSharp.Model.Purchase {
-    public class PurchaseModel {
+namespace SynWord_Server_CSharp.Model.UserPayment {
+    public class RequestPaymentModel {
         [JsonProperty("uId")]
         public string Uid { get; set; }
         [JsonProperty("productId")]

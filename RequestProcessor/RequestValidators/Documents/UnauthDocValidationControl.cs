@@ -1,16 +1,16 @@
 ﻿using SynWord_Server_CSharp.Model.UserData;
-using SynWord_Server_CSharp.UserDataHandlers;
 using System;
 using Microsoft.AspNetCore.Http;
+using SynWord_Server_CSharp.DAO;
 
 namespace SynWord_Server_CSharp.RequestProcessor.RequestValidators.Documents {
     public class UnauthDocValidationControl : IDocumentValidationControl {
         private UnauthUserApplicationDataModel _userData;
-        private IUserDataHandler<UnauthUserApplicationDataModel> _userDataHandler;
+        private IUnauthUserDao _userDao;
 
         public UnauthDocValidationControl(string ip, IFormFile file) : base(file) {
-            _userDataHandler = new UnauthUserApplicationDataHandler();
-            _userData = _userDataHandler.GetUserData(ip);
+            _userDao = new UnauthUserApplicationDataDao();
+            _userData = _userDao.GetUserDataById(ip);
         }
 
         protected override bool IsPremium() {
@@ -31,7 +31,7 @@ namespace SynWord_Server_CSharp.RequestProcessor.RequestValidators.Documents {
 
         public override void SpendCoins(int price) {
             _userData.coins -= price;
-            _userDataHandler.SetUserData(_userData);
+            _userDao.SetUserData(_userData);
         }
     }
 }

@@ -1,16 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using SynWord_Server_CSharp.Model;
 using SynWord_Server_CSharp.RequestProcessor.RequestValidators;
 using SynWord_Server_CSharp.Logging;
 using SynWord_Server_CSharp.Model.Log;
 using SynWord_Server_CSharp.Model.Request;
 using SynWord_Server_CSharp.Constants;
 using SynWord_Server_CSharp.RequestProcessor.RequestHandlers;
-using SynWord_Server_CSharp.Exceptions;
 
 namespace SynWord_Server_CSharp.RequestProcessor {
     public class UniqueUpRequestProcessor {

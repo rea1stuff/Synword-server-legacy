@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace SynWord_Server_CSharp.DAO {
-    public class UnauthUserApplicationDataDao : IDao<UnauthUserApplicationDataModel> {
+    public class UnauthUserApplicationDataDao : IUnauthUserDao {
         private IMongoDatabase _db;
         private IMongoCollection<BsonDocument> _collection;
 
@@ -17,17 +17,7 @@ namespace SynWord_Server_CSharp.DAO {
         }
 
         public void Create(UnauthUserApplicationDataModel userData) {
-            BsonDocument userDataDefaults = new BsonDocument{
-                { "uId", userData.uId},
-                { "ip",  userData.ip},
-                { "coins", userData.coins },
-                { "uniqueCheckMaxSymbolLimit", userData.uniqueCheckMaxSymbolLimit },
-                { "uniqueUpMaxSymbolLimit", userData.uniqueUpMaxSymbolLimit },
-                { "documentUniqueUpMaxSymbolLimit", userData.documentUniqueUpMaxSymbolLimit },
-                { "lastVisitDate", userData.lastVisitDate },
-                { "creationDate", userData.creationDate }
-            };
-            _collection.InsertOne(userDataDefaults);
+            _collection.InsertOne(userData.ToBsonDocument());
         }
 
         public List<UnauthUserApplicationDataModel> GetAllUsersData() {
@@ -84,8 +74,8 @@ namespace SynWord_Server_CSharp.DAO {
                                         );
         }
 
-        public void DeleteUserData(string ip) {
-            var deleteFilter = Builders<BsonDocument>.Filter.Eq("ip", ip);
+        public void DeleteUserData(string uId) {
+            var deleteFilter = Builders<BsonDocument>.Filter.Eq("uId", uId);
 
             _collection.DeleteOne(deleteFilter);
         }

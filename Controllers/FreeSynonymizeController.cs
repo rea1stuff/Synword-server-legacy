@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using SynWord_Server_CSharp.Model;
 using SynWord_Server_CSharp.Model.Log;
 using SynWord_Server_CSharp.RequestProcessor;
@@ -13,7 +12,7 @@ namespace SynWord_Server_CSharp.Controllers {
         UniqueUpRequestProcessor _requestProcessor = new UniqueUpRequestProcessor();
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] UnauthUserModel user) {
+        public async Task<IActionResult> Post([FromForm] UnauthUserModel user) {
             string clientIp = Request.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
 
             userLogModel = new UnauthUserLogDataModel(clientIp, user);
@@ -22,7 +21,7 @@ namespace SynWord_Server_CSharp.Controllers {
         }
 
         [HttpPost("auth")]
-        public async Task<IActionResult> PostAuth([FromBody] AuthUserModel user) {
+        public async Task<IActionResult> PostAuth([FromForm] AuthUserModel user) {
             string clientIp = Request.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
 
             userLogModel = new AuthUserLogDataModel(clientIp, user);

@@ -26,7 +26,7 @@ namespace SynWord_Server_CSharp.RequestProcessor {
             try {
                 RequestLogger.Add(new RequestStatusLog(RequestTypes.DocxUniqueCheck, user.ToDictionary(), RequestStatuses.Start));
 
-                _validationControl = new AuthDocValidationControl(user.Ip, user.UserModel.Files);
+                _validationControl = new AuthDocValidationControl(user.UserModel.Uid, user.UserModel.Files);
 
                 _validationControl.PremiumVerification();
 

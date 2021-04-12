@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Configuration;
 using MongoDB.Driver;
-using System;
 using MongoDB.Bson;
 using SynWord_Server_CSharp.Model;
 

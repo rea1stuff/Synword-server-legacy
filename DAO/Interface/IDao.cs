@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 
 namespace SynWord_Server_CSharp.DAO {
-    interface IDao<T> {
+    public interface IDao<T> {
         public void Create(T userData);
         List<T> GetAllUsersData();
         public T GetUserDataById(string uId);

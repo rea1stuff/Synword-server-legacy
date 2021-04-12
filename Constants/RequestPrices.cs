@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace SynWord_Server_CSharp.Constants {
+﻿namespace SynWord_Server_CSharp.Constants {
     public class RequestPrices {
         public const int UniqueUpPrice = 1;
         public const int UniqueCheckPrice = 3;

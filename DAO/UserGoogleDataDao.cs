@@ -18,7 +18,7 @@ namespace SynWord_Server_CSharp.DAO {
 
         public void Create(UserGoogleDataModel userData) {
             BsonDocument userDataDefaults = new BsonDocument{
-                { "uId",  userData.uId},
+                { "uId",  userData.id},
                 { "email", userData.email },
                 { "verified_email", userData.verified_email },
                 { "name", userData.name },
@@ -57,10 +57,10 @@ namespace SynWord_Server_CSharp.DAO {
         }
 
         public void SetUserData(UserGoogleDataModel userData) {
-            var filter = new BsonDocument("uId", userData.uId);
+            var filter = new BsonDocument("uId", userData.id);
             _collection.UpdateOne(
                 filter,
-                Builders<BsonDocument>.Update.Set("uId", userData.uId)
+                Builders<BsonDocument>.Update.Set("uId", userData.id)
                                         .Set("email", userData.email)
                                         .Set("verified_email", userData.verified_email)
                                         .Set("name", userData.name)

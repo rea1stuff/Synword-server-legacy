@@ -11,7 +11,7 @@ namespace SynWord_Server_CSharp.GoogleApi {
 
         public static string GetUserId(string accessToken) {
             var googleUserModel = GetGoogleUserModel(accessToken);
-            return googleUserModel.uId;
+            return googleUserModel.id;
         }
 
         public static UserGoogleDataModel GetGoogleUserModel(string accessToken) {

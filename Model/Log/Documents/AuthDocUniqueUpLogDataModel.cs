@@ -1,8 +1,5 @@
 ﻿using SynWord_Server_CSharp.Model.FileUpload;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace SynWord_Server_CSharp.Model.Log.Documents {
     public class AuthDocUniqueUpLogDataModel {

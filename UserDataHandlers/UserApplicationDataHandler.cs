@@ -1,16 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Configuration;
-using MongoDB.Driver;
-using MongoDB.Bson;
 using SynWord_Server_CSharp.Constants;
-using SynWord_Server_CSharp.GoogleApi;
 using SynWord_Server_CSharp.DAO;
 using SynWord_Server_CSharp.Model.UserData;
 
 namespace SynWord_Server_CSharp.UserDataHandlers {
-    public class UserApplicationDataHandler : IUserDataHandler<UserApplicationDataModel> {
+    public class UserApplicationDataHandler {
         IDao<UserApplicationDataModel> _db;
 
         public UserApplicationDataHandler() {
@@ -35,18 +29,6 @@ namespace SynWord_Server_CSharp.UserDataHandlers {
             _db.Create(userData);
         }
 
-        public UserApplicationDataModel GetUserData(string uId) {
-            return _db.GetUserDataById(uId);
-        }
-
-        public void SetUserData(UserApplicationDataModel userData) {
-            _db.SetUserData(userData);
-        }
-
-        public void DeleteUserData(string uId) {
-            _db.DeleteUserData(uId);
-        }
-
         public void SetPremium(string uId) {
             UserApplicationDataModel userData = _db.GetUserDataById(uId);
 
@@ -59,6 +41,7 @@ namespace SynWord_Server_CSharp.UserDataHandlers {
             if (userData.coins < PremiumUserLimits.Coins) {
                 userData.coins = PremiumUserLimits.Coins;
             }
+            _db.SetUserData(userData);
         }
 
         public bool IsUserExist(string uId) {

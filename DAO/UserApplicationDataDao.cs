@@ -7,7 +7,7 @@ using System.Linq;
 using SynWord_Server_CSharp.Exceptions;
 
 namespace SynWord_Server_CSharp.DAO {
-    public class UserApplicationDataDao : IDao<UserApplicationDataModel> {
+    public class UserApplicationDataDao : IUserApplicationDataDao {
         private IMongoDatabase _db;
         private IMongoCollection<BsonDocument> _collection;
 
@@ -17,17 +17,7 @@ namespace SynWord_Server_CSharp.DAO {
         }
 
         public void Create(UserApplicationDataModel userData) {
-            BsonDocument userDataDefaults = new BsonDocument{
-                { "uId",  userData.uId},
-                { "isPremium", userData.isPremium },
-                { "coins", userData.coins },
-                { "uniqueCheckMaxSymbolLimit", userData.uniqueCheckMaxSymbolLimit },
-                { "uniqueUpMaxSymbolLimit", userData.uniqueUpMaxSymbolLimit },
-                { "documentUniqueCheckMaxSymbolLimit", userData.documentUniqueCheckMaxSymbolLimit },
-                { "documentUniqueUpMaxSymbolLimit", userData.documentUniqueUpMaxSymbolLimit },
-                { "creationDate", userData.creationDate }
-            };
-            _collection.InsertOne(userDataDefaults);
+            _collection.InsertOne(userData.ToBsonDocument());
         }
 
         public List<UserApplicationDataModel> GetAllUsersData() {
@@ -45,19 +35,6 @@ namespace SynWord_Server_CSharp.DAO {
 
         public UserApplicationDataModel GetUserDataById(string uId) {
             var filter = new BsonDocument("uId", uId);
-            BsonDocument userData = _collection.Find(filter).FirstOrDefault();
-
-            if (userData == null) {
-                throw new UserDoesNotExistException();
-            }
-
-            UserApplicationDataModel userDataModel = BsonSerializer.Deserialize<UserApplicationDataModel>(userData);
-
-            return userDataModel;
-        }
-
-        public UserApplicationDataModel GetUserDataByIp(string ip) {
-            var filter = new BsonDocument("ip", ip);
             BsonDocument userData = _collection.Find(filter).FirstOrDefault();
 
             if (userData == null) {

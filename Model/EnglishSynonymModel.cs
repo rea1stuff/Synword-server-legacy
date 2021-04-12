@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace SynWord_Server_CSharp.Model {
     public class EnglishSynonym : Synonym {

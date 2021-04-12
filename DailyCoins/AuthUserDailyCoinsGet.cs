@@ -1,9 +1,6 @@
 ﻿using SynWord_Server_CSharp.DAO;
 using SynWord_Server_CSharp.Model.UserData;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace SynWord_Server_CSharp.DailyCoins {
     public class AuthUserDailyCoinsGet : IDailyCoinsGet {

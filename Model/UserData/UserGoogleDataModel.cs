@@ -3,7 +3,7 @@
 namespace SynWord_Server_CSharp.Model.UserData {
     [BsonIgnoreExtraElements]
     public class UserGoogleDataModel {
-        public string uId { get; set; }
+        public string id { get; set; }
         public string email { get; set; }
         public string verified_email { get; set; }
         public string name { get; set; }

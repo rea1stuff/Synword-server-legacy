@@ -2,14 +2,15 @@
 using System;
 using SynWord_Server_CSharp.UserDataHandlers;
 using SynWord_Server_CSharp.GoogleApi;
-using SynWord_Server_CSharp.Model.UserData;
+using SynWord_Server_CSharp.DAO;
 
 namespace SynWord_Server_CSharp.Controllers {
     [Route("api/[controller]")]
     [ApiController]
     public class RegistrationController : ControllerBase {
-        [HttpPost]
+        [HttpGet]
         public IActionResult Registration() {
+            Console.WriteLine("Unauth Registration");
             string clientIp = Request.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
             string token;
             try {
@@ -21,7 +22,7 @@ namespace SynWord_Server_CSharp.Controllers {
                 } else {
                     token = unauthDataHandler.GetUserDataByIp(clientIp).uId;
                 }
-
+                Console.WriteLine("Unauth Registration COMPLETED");
                 return Ok(token);
             } catch (Exception exception) {
                 return BadRequest(exception.Message);
@@ -29,19 +30,19 @@ namespace SynWord_Server_CSharp.Controllers {
         }
 
         [HttpPost("auth")]
-        public IActionResult AuthRegistration([FromBody] string accessToken) {
-            string clientIp = Request.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
+        public IActionResult AuthRegistration([FromForm] string accessToken) {
+            Console.WriteLine("Auth Registration");
             try {
-                IUserDataHandler<UserApplicationDataModel> dataHandler = new UserApplicationDataHandler();
-                IUserDataHandler<UserGoogleDataModel> googleDataHandler = new UserGoogleDataHandler();
+                UserApplicationDataHandler authUser = new UserApplicationDataHandler();
+                UserGoogleDataDao googleDataDB = new UserGoogleDataDao();
 
-                string uId = GoogleAuthApi.GetUserId(accessToken);
+                var googleModel = GoogleAuthApi.GetGoogleUserModel(accessToken);
 
-                if (!dataHandler.IsUserExist(accessToken)) {
-                    dataHandler.CreateUser(accessToken);
-                    googleDataHandler.CreateUser(accessToken);
+                if (!authUser.IsUserExist(googleModel.id)) {
+                    authUser.CreateUser(googleModel.id);
+                    googleDataDB.Create(googleModel);
                 }
-
+                Console.WriteLine("Auth Registration COMPLETED");
                 return Ok();
             } catch (Exception exception) {
                 return BadRequest(exception.Message);

@@ -1,14 +1,14 @@
-﻿using SynWord_Server_CSharp.UserDataHandlers;
-using SynWord_Server_CSharp.Model.UserData;
+﻿using SynWord_Server_CSharp.Model.UserData;
+using SynWord_Server_CSharp.DAO;
 
 namespace SynWord_Server_CSharp.RequestProcessor.RequestValidators {
     public class UnauthValidationControl : IValidationControl {
         private UnauthUserApplicationDataModel _userData;
-        private IUserDataHandler<UnauthUserApplicationDataModel> _userDataHandler;
+        private IUnauthUserDao _userDao;
         
         public UnauthValidationControl(string uId) {
-            _userDataHandler = new UnauthUserApplicationDataHandler();
-            _userData = _userDataHandler.GetUserData(uId);
+            _userDao = new UnauthUserApplicationDataDao();
+            _userData = _userDao.GetUserDataById(uId);
         }
 
         protected override int GetCoins() {
@@ -25,7 +25,7 @@ namespace SynWord_Server_CSharp.RequestProcessor.RequestValidators {
 
         public override void SpendCoins(int price) {
             _userData.coins -= price;
-            _userDataHandler.SetUserData(_userData);
+            _userDao.SetUserData(_userData);
         }
     }
 }

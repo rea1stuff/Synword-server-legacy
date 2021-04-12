@@ -1,6 +1,6 @@
 ﻿namespace SynWord_Server_CSharp.Exceptions {
     public class UserDoesNotExistException : UserException {
-        const string message = "User does not exist";
+        const string message = "userDoesNotExist";
 
         public UserDoesNotExistException() : base(message) {}
     }
