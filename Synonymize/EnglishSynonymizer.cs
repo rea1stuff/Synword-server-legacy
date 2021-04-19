@@ -92,9 +92,24 @@ namespace SynWord_Server_CSharp.Synonymize {
                 }
             }
 
+            List<ReplacedWordModel> sortedReplaced = new List<ReplacedWordModel>();
+
+            for (int i = 0; i < replaced.Count; i++) {
+                int index = 0;
+
+                for (int j = 0; j < replaced.Count; j++) {
+                    if (replaced[index].Word.StartIndex > replaced[j].Word.StartIndex) {
+                        index = i;
+                    }
+                }
+
+                sortedReplaced.Add(replaced[index]);
+                replaced.RemoveAt(index);
+            }
+
             UniqueUpResponseModel uniqueUpResponse = new UniqueUpResponseModel();
             uniqueUpResponse.Text = textBuilder.ToString();
-            uniqueUpResponse.Replaced = replaced.ToArray();
+            uniqueUpResponse.Replaced = sortedReplaced.ToArray();
             uniqueUpResponse.ReplacedCount = replacedCount;
 
             return uniqueUpResponse;

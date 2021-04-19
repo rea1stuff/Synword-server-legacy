@@ -6,5 +6,7 @@ namespace SynWord_Server_CSharp.Model {
         public string Uid { get; set; }
         [JsonProperty("text")]
         public string Text { get; set; }
+        [JsonProperty("language")]
+        public string Language { get; set; }
     }
 }

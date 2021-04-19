@@ -5,7 +5,7 @@ using SynWord_Server_CSharp.Model;
 using SynWord_Server_CSharp.Model.UniqueUp;
 
 namespace SynWord_Server_CSharp.Synonymize {
-    abstract class Synonymizer {
+    public abstract class Synonymizer {
         public abstract Task<UniqueUpResponseModel> SynonymizeAsync(string text);
 
         public abstract UniqueUpResponseModel Synonymize(string text);

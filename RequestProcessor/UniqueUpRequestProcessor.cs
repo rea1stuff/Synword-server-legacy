@@ -7,6 +7,8 @@ using SynWord_Server_CSharp.Model.Log;
 using SynWord_Server_CSharp.Model.Request;
 using SynWord_Server_CSharp.Constants;
 using SynWord_Server_CSharp.RequestProcessor.RequestHandlers;
+using SynWord_Server_CSharp.Synonymize;
+using System.Collections.Generic;
 
 namespace SynWord_Server_CSharp.RequestProcessor {
     public class UniqueUpRequestProcessor {
@@ -26,7 +28,9 @@ namespace SynWord_Server_CSharp.RequestProcessor {
                 _validationControl.UniqueUpMaxSymbolLimitVerification(textLength);
                 _validationControl.IsUserHaveEnoughCoins(_requestPrice);
 
-                IActionResult result = await _uniqueUp.HandleRequest(user.UserModel.Text);
+                IActionResult result = await _uniqueUp.HandleRequest(user.UserModel.Text, new Dictionary<string, dynamic>() {
+                    { "language", user.UserModel.Language }
+                });
 
                 _validationControl.SpendCoins(_requestPrice);
 
@@ -51,7 +55,9 @@ namespace SynWord_Server_CSharp.RequestProcessor {
                 _validationControl.UniqueUpMaxSymbolLimitVerification(textLength);
                 _validationControl.IsUserHaveEnoughCoins(_requestPrice);
 
-                IActionResult result = await _uniqueUp.HandleRequest(user.UserModel.Text);
+                IActionResult result = await _uniqueUp.HandleRequest(user.UserModel.Text, new Dictionary<string, dynamic>() {
+                    { "language", user.UserModel.Language }
+                });
 
                 _validationControl.SpendCoins(_requestPrice);
 
