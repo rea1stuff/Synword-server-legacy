@@ -26,7 +26,7 @@ namespace SynWord_Server_CSharp.Synonymize {
                     string synonym = SynonymDictionary.russianDictionary[SynonymDictionary.russianDictionary[index].SynonymId].Word;
 
                     List<string> synonyms = new List<string>();
-                    synonyms.Add(word);
+                    synonyms.Add(word.ToLower());
                     synonyms.Add(synonym);
 
                     if (char.IsUpper(word[0])) {

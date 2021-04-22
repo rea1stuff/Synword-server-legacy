@@ -54,7 +54,7 @@ namespace SynWord_Server_CSharp.Synonymize {
 
                             if (synonyms.Count > 0) {
                                 string synonym = synonyms[new Random().Next(synonyms.Count)];
-                                synonyms.Insert(0, word);
+                                synonyms.Insert(0, word.ToLower());
 
                                 if (char.IsUpper(word[0])) {
                                     synonym = char.ToUpper(synonym[0]) + synonym.Substring(1);
@@ -78,7 +78,7 @@ namespace SynWord_Server_CSharp.Synonymize {
                                 int difference = synonymLength - wordLength;
                                 replacedCount++;
 
-                                words.Insert(i, new WordModel(words[i].StartIndex + difference, words[i].StartIndex + difference + synonym.Length - 1, true));
+                                words.Insert(i, new WordModel(words[i].StartIndex, words[i].StartIndex + synonym.Length - 1, true));
 
                                 words.RemoveRange(i + 1, intervalWords.Count);
 
@@ -86,12 +86,23 @@ namespace SynWord_Server_CSharp.Synonymize {
                                     words[j].StartIndex += difference;
                                     words[j].EndIndex += difference;
                                 }
+
+                                ReplacedWordModel currentReplaced = replaced[replaced.Count - 1];
+
+                                for (int j = 0; j < replaced.Count - 1; j++) {
+                                    if (replaced[j].Word.StartIndex >= currentReplaced.Word.StartIndex 
+                                        || replaced[j].Word.StartIndex <= currentReplaced.Word.StartIndex && 
+                                        replaced[j].Word.EndIndex <= currentReplaced.Word.EndIndex && replaced[j].Word.EndIndex >= currentReplaced.Word.StartIndex) {
+                                        replaced[j].Word.StartIndex += difference;
+                                        replaced[j].Word.EndIndex += difference;
+                                    }
+                                }
                             }
                         }
                     }
                 }
             }
-
+            
             List<ReplacedWordModel> sortedReplaced = new List<ReplacedWordModel>();
 
             for (int i = 0; i < replaced.Count; i++) {
@@ -99,13 +110,16 @@ namespace SynWord_Server_CSharp.Synonymize {
 
                 for (int j = 0; j < replaced.Count; j++) {
                     if (replaced[index].Word.StartIndex > replaced[j].Word.StartIndex) {
-                        index = i;
+                        index = j;
+                        i = 0;
                     }
                 }
 
                 sortedReplaced.Add(replaced[index]);
                 replaced.RemoveAt(index);
             }
+
+            sortedReplaced.Add(replaced[0]);
 
             UniqueUpResponseModel uniqueUpResponse = new UniqueUpResponseModel();
             uniqueUpResponse.Text = textBuilder.ToString();
