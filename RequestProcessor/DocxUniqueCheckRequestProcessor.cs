@@ -13,7 +13,7 @@ using SynWord_Server_CSharp.DocumentHandling.Docx;
 namespace SynWord_Server_CSharp.RequestProcessor {
     public class DocxUniqueCheckRequestProcessor {
         private IDocumentValidationControl _validationControl;
-        private IDocumentRequestHandler _uniqueCheck;
+        private UniqueCheckDocRequestHandler _uniqueCheck;
         private int _requestPrice = RequestPrices.DocumentUniqueCheckPrice;
         private string _filePath;
 

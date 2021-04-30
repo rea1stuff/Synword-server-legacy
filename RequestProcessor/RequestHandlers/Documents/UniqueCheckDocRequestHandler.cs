@@ -6,8 +6,7 @@ using Newtonsoft.Json;
 using SynWord_Server_CSharp.DocumentHandling.Docx;
 
 namespace SynWord_Server_CSharp.RequestProcessor.RequestHandlers.Documents {
-    public class UniqueCheckDocRequestHandler : IDocumentRequestHandler {
-        private UniqueCheckApi _uniqueCheckFromApi = new UniqueCheckApi();
+    public class UniqueCheckDocRequestHandler {
         private string _filePath;
 
         public UniqueCheckDocRequestHandler(string filePath) {

@@ -50,21 +50,21 @@ namespace SynWord_Server_CSharp.Controllers {
 
                 switch (purchase.ProductId) {
                     case "premium": _userDataHandler.SetPremium(userData.uId); break;
-                    case "100_coins": {
+                    case "coins_100": {
                             userData.coins += 100;
                             _userDao.SetUserData(userData);
                                 } break;
-                    case "300_coins": {
+                    case "coins_300": {
                             userData.coins += 300;
                             _userDao.SetUserData(userData);
                         }
                         break;
-                    case "600_coins": {
+                    case "coins_600": {
                             userData.coins += 600;
                             _userDao.SetUserData(userData);
                         }
                         break;
-                    case "1000_coins": {
+                    case "coins_1000": {
                             userData.coins += 1000;
                             _userDao.SetUserData(userData);
                         }

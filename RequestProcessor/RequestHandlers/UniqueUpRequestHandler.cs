@@ -6,8 +6,8 @@ using SynWord_Server_CSharp.Synonymize;
 using System.Collections.Generic;
 
 namespace SynWord_Server_CSharp.RequestProcessor.RequestHandlers {
-    public class UniqueUpRequestHandler : IRequestHandler {        
-        public override async Task<IActionResult> HandleRequest(string text, Dictionary<string, dynamic> arguments = null) {
+    public class UniqueUpRequestHandler {
+        public async Task<IActionResult> HandleRequest(string text, Dictionary<string, dynamic> arguments = null) {
             Synonymizer synonymizer = new RussianSynonymizer();
 
             if (arguments != null) {

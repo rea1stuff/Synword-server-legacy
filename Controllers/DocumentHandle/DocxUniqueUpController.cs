@@ -19,12 +19,12 @@ namespace SynWord_Server_CSharp.Controllers {
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromForm] FileUploadModel user) {
+        public async Task<IActionResult> Post([FromForm] FileUploadModel requestData) {
             string clientIp = Request.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
 
-            string filePath = path + _fileId + "_" + "UniqueUp" + "_" + user.Files.FileName;
+            string filePath = path + _fileId + "_" + "UniqueUp" + "_" + requestData.Files.FileName;
 
-            UnauthDocUniqueUpLogDataModel userLogModel = new UnauthDocUniqueUpLogDataModel(clientIp, user);
+            UnauthDocUniqueUpLogDataModel userLogModel = new UnauthDocUniqueUpLogDataModel(clientIp, requestData);
 
             processor = new DocxUniqueUpRequestProcessor(filePath);
 
@@ -32,12 +32,12 @@ namespace SynWord_Server_CSharp.Controllers {
         }
 
         [HttpPost("auth")]
-        public async Task<IActionResult> Authorized([FromForm] AuthFileUploadModel user) {
+        public async Task<IActionResult> Authorized([FromForm] AuthFileUploadModel requestData) {
             string clientIp = Request.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
 
-            string filePath = path + _fileId + "_" + "AuthUniqueUp" + "_" + user.Files.FileName;
+            string filePath = path + _fileId + "_" + "AuthUniqueUp" + "_" + requestData.Files.FileName;
 
-            AuthDocUniqueUpLogDataModel userLogModel = new AuthDocUniqueUpLogDataModel(clientIp, user);
+            AuthDocUniqueUpLogDataModel userLogModel = new AuthDocUniqueUpLogDataModel(clientIp, requestData);
 
             processor = new DocxUniqueUpRequestProcessor(filePath);
 

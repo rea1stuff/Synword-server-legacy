@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 
 namespace SynWord_Server_CSharp.Model {
-    public class AuthUserModel : IUserModel {
+    public class UnauthUserRequestModel : IUserRequestModel {
         [JsonProperty("uId")]
         public string Uid { get; set; }
         [JsonProperty("text")]

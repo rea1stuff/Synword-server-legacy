@@ -13,7 +13,7 @@ using SynWord_Server_CSharp.DocumentHandling.Docx;
 namespace SynWord_Server_CSharp.RequestProcessor {
     public class DocxUniqueUpRequestProcessor {
         private IDocumentValidationControl _validationControl;
-        private IDocumentRequestHandler _uniqueUp;
+        private UniqueUpDocRequestHandler _uniqueUp;
         private int _requestPrice = RequestPrices.DocumentUniqueUpPrice;
         private string _filePath;
 
@@ -38,7 +38,7 @@ namespace SynWord_Server_CSharp.RequestProcessor {
                 _validationControl.UniqueUpMaxSymbolLimitVerification(symbolCount);
                 _validationControl.IsUserHaveEnoughCoins(_requestPrice);
 
-                IActionResult result = await _uniqueUp.HandleRequest();
+                IActionResult result = await _uniqueUp.HandleRequest(user.UserModel.Language);
 
                 _validationControl.SpendCoins(_requestPrice);
 
@@ -67,7 +67,7 @@ namespace SynWord_Server_CSharp.RequestProcessor {
                 _validationControl.UniqueCheckMaxSymbolLimitVerification(symbolCount);
                 _validationControl.IsUserHaveEnoughCoins(_requestPrice);
 
-                IActionResult result = await _uniqueUp.HandleRequest();
+                IActionResult result = await _uniqueUp.HandleRequest(user.UserModel.Language);
 
                 _validationControl.SpendCoins(_requestPrice);
 

@@ -6,10 +6,10 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 
 namespace SynWord_Server_CSharp.RequestProcessor.RequestHandlers {
-    public class UniqueCheckRequestHandler : IRequestHandler {
+    public class UniqueCheckRequestHandler {
         private UniqueCheckApi _uniqueCheckFromApi = new UniqueCheckApi();
 
-        public override async Task<IActionResult> HandleRequest(string text, Dictionary<string, dynamic> arguments = null) {
+        public async Task<IActionResult> HandleRequest(string text) {
             UniqueCheckResponseModel uniqueCheckResponse = await _uniqueCheckFromApi.UniqueCheck(text);
 
             string uniqueCheckResponseJson = JsonConvert.SerializeObject(uniqueCheckResponse);

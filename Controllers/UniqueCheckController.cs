@@ -12,19 +12,19 @@ namespace SynWord_Server_CSharp.Controllers {
         private UniqueCheckRequestProcessor requestProcessor = new UniqueCheckRequestProcessor();
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromForm] UnauthUserModel user) {
+        public async Task<IActionResult> Post([FromForm] UnauthUserRequestModel requestData) {
             string clientIp = Request.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
 
-            userLogModel = new UnauthUserLogDataModel(clientIp, user);
+            userLogModel = new UnauthUserLogDataModel(clientIp, requestData);
 
             return await requestProcessor.UnauthUserRequestExecution(userLogModel);
         }
 
         [HttpPost("auth")]
-        public async Task<IActionResult> PostAuth([FromForm] AuthUserModel user) {
+        public async Task<IActionResult> PostAuth([FromForm] AuthUserRequestModel requestData) {
             string clientIp = Request.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
 
-            userLogModel = new AuthUserLogDataModel(clientIp, user);
+            userLogModel = new AuthUserLogDataModel(clientIp, requestData);
 
             return await requestProcessor.AuthUserRequestExecution(userLogModel);
         }

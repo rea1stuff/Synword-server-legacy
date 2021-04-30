@@ -16,20 +16,22 @@ namespace SynWord_Server_CSharp.RequestProcessor.RequestValidators {
         }
 
         public void UniqueCheckMaxSymbolLimitVerification(int textLength) {
-            if (GetUniqueCheckMaxSymbolLimit() < textLength) {
-                throw new MaxSymbolLimitException();
+            int maxSymbolLimit = GetUniqueCheckMaxSymbolLimit();
+            if (maxSymbolLimit < textLength) {
+                throw new MaxSymbolLimitException(textLength);
             }
         }
 
         public void UniqueUpMaxSymbolLimitVerification(int textLength) {
-            if (GetUniqueUpMaxSymbolLimit() < textLength) {
-                throw new MaxSymbolLimitException();
+            int maxSymbolLimit = GetUniqueUpMaxSymbolLimit();
+            if (maxSymbolLimit < textLength) {
+                throw new MaxSymbolLimitException(textLength);
             }
         }
 
         public void MinSymbolLimitVerification(int textLength) {
             if (textLength < UserLimits.MinSymbolLimit) {
-                throw new MinSymbolLimitException();
+                throw new MinSymbolLimitException(textLength);
             }
         }
     }

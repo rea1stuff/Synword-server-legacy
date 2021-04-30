@@ -40,7 +40,7 @@ namespace SynWord_Server_CSharp.Controllers {
                 }
 
                 string response = JsonConvert.SerializeObject(unauthUserData);
-
+                
                 RequestLogger.Add(new RequestStatusLog(RequestTypes.Authorization, logInfo, RequestStatuses.Completed));
 
                 return Ok(response);
@@ -64,16 +64,18 @@ namespace SynWord_Server_CSharp.Controllers {
                 logInfo.Add("Ip", clientIp);
                 RequestLogger.Add(new RequestStatusLog(RequestTypes.Authorization, logInfo, RequestStatuses.Start));
 
-                authUserData = _authUserDao.GetUserDataById(uId);
-
                 coinsGet = new AuthUserDailyCoinsGet(uId);
 
                 if (coinsGet.Is24HoursPassed()) {
                     coinsGet.GiveCoinsToUser();
                 }
 
-                string response = JsonConvert.SerializeObject(authUserData);
+                authUserData = _authUserDao.GetUserDataById(uId);
 
+                authUserData.lastVisitDate = DateTime.Now.ToString();
+                _authUserDao.SetUserData(authUserData);
+
+                string response = JsonConvert.SerializeObject(authUserData);
                 RequestLogger.Add(new RequestStatusLog(RequestTypes.Authorization, logInfo, RequestStatuses.Completed));
 
                 return Ok(response);

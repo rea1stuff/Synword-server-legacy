@@ -4,15 +4,15 @@ using System.IO;
 using SynWord_Server_CSharp.DocumentHandling.Docx;
 
 namespace SynWord_Server_CSharp.RequestProcessor.RequestHandlers.Documents {
-    public class UniqueUpDocRequestHandler : IDocumentRequestHandler {
+    public class UniqueUpDocRequestHandler {
         private string _filePath;
         
         public UniqueUpDocRequestHandler(string filePath) {
             _filePath = filePath;
         }
 
-        public async Task<IActionResult> HandleRequest() {
-            DocxUniqueUp.UniqueUp(_filePath);
+        public async Task<IActionResult> HandleRequest(string lang) {
+            DocxUniqueUp.UniqueUp(_filePath, lang);
 
             string mimeType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
             FileStream stream = File.OpenRead(_filePath);

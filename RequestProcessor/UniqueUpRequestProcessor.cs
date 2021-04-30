@@ -13,7 +13,7 @@ using System.Collections.Generic;
 namespace SynWord_Server_CSharp.RequestProcessor {
     public class UniqueUpRequestProcessor {
         IValidationControl _validationControl;
-        IRequestHandler _uniqueUp = new UniqueUpRequestHandler();
+        UniqueUpRequestHandler _uniqueUp = new UniqueUpRequestHandler();
         int _requestPrice = RequestPrices.UniqueUpPrice;
 
         public async Task<IActionResult> UnauthUserRequestExecution(IUserLogDataModel user) {

@@ -11,7 +11,7 @@ using SynWord_Server_CSharp.RequestProcessor.RequestHandlers;
 namespace SynWord_Server_CSharp.RequestProcessor {
     public class UniqueCheckRequestProcessor {
         private IValidationControl _validationControl;
-        private IRequestHandler _uniqueCheck = new UniqueCheckRequestHandler();
+        private UniqueCheckRequestHandler _uniqueCheck = new UniqueCheckRequestHandler();
         private int _requestPrice = RequestPrices.UniqueCheckPrice;
 
         public async Task<IActionResult> UnauthUserRequestExecution(IUserLogDataModel user) {

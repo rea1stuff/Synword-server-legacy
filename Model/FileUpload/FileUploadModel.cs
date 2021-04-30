@@ -6,5 +6,7 @@ namespace SynWord_Server_CSharp.Model.FileUpload {
         [JsonProperty("uId")]
         public string Uid { get; set; }
         public IFormFile Files { get; set; }
+        [JsonProperty("language")]
+        public string Language { get; set; }
     }
 }
