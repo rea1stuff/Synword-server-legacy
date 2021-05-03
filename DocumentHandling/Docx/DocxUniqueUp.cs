@@ -12,6 +12,7 @@ namespace SynWord_Server_CSharp.DocumentHandling.Docx {
                 Language.English => new EnglishSynonymizer(),
                 _ => throw new Exception("Invalid lang code"),
             };
+
             using (WordprocessingDocument document = WordprocessingDocument.Open(documentPath, true)) {
                 Body body = document.MainDocumentPart.Document.Body;
 

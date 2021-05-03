@@ -119,7 +119,9 @@ namespace SynWord_Server_CSharp.Synonymize {
                 replaced.RemoveAt(index);
             }
 
-            sortedReplaced.Add(replaced[0]);
+            if (replaced.Count > 0) {
+                sortedReplaced.Add(replaced[0]);
+            }
 
             UniqueUpResponseModel uniqueUpResponse = new UniqueUpResponseModel();
             uniqueUpResponse.Text = textBuilder.ToString();
