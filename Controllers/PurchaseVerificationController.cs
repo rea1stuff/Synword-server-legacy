@@ -17,10 +17,10 @@ namespace SynWord_Server_CSharp.Controllers {
         [HttpPost]
         public IActionResult Post([FromForm] RequestPaymentModel purchase) {
             try {
-                Console.WriteLine("Verification");
-                Console.WriteLine(purchase.PurchaseToken);
+                Console.WriteLine("PurchaseVerificationController");
+                Console.WriteLine(purchase.Uid);
                 Console.WriteLine(purchase.ProductId);
-
+                
                 UserApplicationDataModel userData = _userDao.GetUserDataById(purchase.Uid);
 
                 int coins = userData.coins;

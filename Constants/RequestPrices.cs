@@ -3,6 +3,6 @@
         public const int UniqueUpPrice = 1;
         public const int UniqueCheckPrice = 3;
         public const int DocumentUniqueUpPrice = 2;
-        public const int DocumentUniqueCheckPrice = 6;
+        public const int DocumentUniqueCheckPrice = 7;
     }
 }

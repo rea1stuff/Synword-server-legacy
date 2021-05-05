@@ -7,7 +7,6 @@ using SynWord_Server_CSharp.Model.Log;
 using SynWord_Server_CSharp.Model.Request;
 using SynWord_Server_CSharp.Constants;
 using SynWord_Server_CSharp.RequestProcessor.RequestHandlers;
-using SynWord_Server_CSharp.Synonymize;
 using System.Collections.Generic;
 
 namespace SynWord_Server_CSharp.RequestProcessor {

@@ -1,12 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SynWord_Server_CSharp.Model;
 using System;
 using System.Net;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Web;
 using SynWord_Server_CSharp.DAO;
 using SynWord_Server_CSharp.Model.UserData;
 
@@ -23,7 +18,7 @@ namespace SynWord_Server_CSharp.Controllers {
             try {
                 string clientIp = Request.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
                 IPHostEntry host = Dns.GetHostEntry(clientIp);
-                //Уязвимо
+
                 if (!host.HostName.Contains(".google.com")) {
                     throw new Exception("Unknown host");
                 }

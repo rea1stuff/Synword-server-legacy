@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SynWord_Server_CSharp.Exceptions;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 

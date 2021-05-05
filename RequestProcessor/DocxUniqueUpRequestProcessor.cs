@@ -64,7 +64,7 @@ namespace SynWord_Server_CSharp.RequestProcessor {
                 int symbolCount = DocxGet.GetSymbolCount(_filePath);
 
                 _validationControl.MinSymbolLimitVerification(symbolCount);
-                _validationControl.UniqueCheckMaxSymbolLimitVerification(symbolCount);
+                _validationControl.UniqueUpMaxSymbolLimitVerification(symbolCount);
                 _validationControl.IsUserHaveEnoughCoins(_requestPrice);
 
                 IActionResult result = await _uniqueUp.HandleRequest(user.UserModel.Language);

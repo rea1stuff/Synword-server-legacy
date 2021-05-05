@@ -4,7 +4,7 @@ using System;
 
 namespace SynWord_Server_CSharp.DailyCoins {
     public class AuthUserDailyCoinsGet : IDailyCoinsGet {
-        private const int _numOfCoinsPerDay = 10;
+        private const int _numOfCoinsPerDay = 25;
         IDao<UserApplicationDataModel> _db = new UserApplicationDataDao();
         UserApplicationDataModel _userData = new UserApplicationDataModel();
         string _uId;

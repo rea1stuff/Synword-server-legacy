@@ -3,7 +3,6 @@ using SynWord_Server_CSharp.UniqueCheck;
 using System.Threading.Tasks;
 using SynWord_Server_CSharp.Model.UniqueCheck;
 using Newtonsoft.Json;
-using System.Collections.Generic;
 
 namespace SynWord_Server_CSharp.RequestProcessor.RequestHandlers {
     public class UniqueCheckRequestHandler {

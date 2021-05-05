@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SynWord_Server_CSharp.UniqueCheck;
 using System.Threading.Tasks;
 using SynWord_Server_CSharp.Model.UniqueCheck;
 using Newtonsoft.Json;
