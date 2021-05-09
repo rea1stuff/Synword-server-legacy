@@ -4,6 +4,10 @@ using Microsoft.Extensions.Hosting;
 using SynWord_Server_CSharp.Synonymize;
 using SynWord_Server_CSharp.Logging;
 using SynWord_Server_CSharp.DailyCoins;
+using System.Net;
+using Microsoft.AspNetCore;
+using System.Configuration;
+using System.IO;
 
 namespace SynWord_Server_CSharp {
     public class Program {
@@ -11,13 +15,19 @@ namespace SynWord_Server_CSharp {
             CreateHostBuilder(args).Build().Run();
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder => {
-                    webBuilder.UseStartup<Startup>();
-                    SynonymDictionary.InitializeDictionary();
-                    Task.Run(() => new MidnightReset().UseReset());
-                    Task.Run(() => RequestLogger.Logging());
-                });
+        public static IWebHostBuilder CreateHostBuilder(string[] args) =>
+                    WebHost.CreateDefaultBuilder(args)
+                        .UseKestrel(options => {
+                            SynonymDictionary.InitializeDictionary();
+                            Task.Run(() => new MidnightReset().UseReset());
+                            Task.Run(() => RequestLogger.Logging());
+
+                            options.Listen(IPAddress.Any, 5000);
+                            options.Listen(IPAddress.Any, 5001, listenOptions => {
+                                listenOptions.UseHttps(Directory.GetCurrentDirectory() + "/Files/certificate.pfx", ConfigurationManager.AppSettings["sslCertPass"]);
+                            });
+                        })
+                        .UseStartup<Startup>();
+
     }
 }
