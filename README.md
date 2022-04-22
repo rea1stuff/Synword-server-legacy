@@ -6,7 +6,11 @@
 
 Verify & enhance the uniqueness of your texts and documents.
 
-[Google Play](https://play.google.com/store/apps/details?id=com.patronum.synword)
+**This repository is outdated and no longer supported**
+
+**[Main repository](https://github.com/rea1stuff/Synword)**
+
+**[Website](https://synword.com)**
 
 <p align="center">
     <img src="https://play-lh.googleusercontent.com/VurmcHGzsynh5LHccYjOa6TQojT2U6tZAFOby22W1nnLAYr6XaWT8iiQtuxcndFeMaU=w1496-h754-rw"/>
